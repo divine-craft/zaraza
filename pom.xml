@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<!--
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>ru.divinecraft</groupId>
+    <artifactId>zaraza</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>8</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <!-- GitHub -->
+        <github.owner>divine-craft</github.owner>
+        <github.repository>zaraza</github.repository>
+        <github.coordinate>${github.owner}/${github.repository}</github.coordinate>
+        <github.url>https://github.com/${github.coordinate}</github.url>
+        <!-- Dependency versions -->
+        <version.padla>1.0.0-SNAPSHOT</version.padla>
+    </properties>
+
+    <name>Zaraza</name>
+    <description>DivineCraft Common APIs</description>
+    <url>https://divinecraft.ru/</url>
+    <inceptionYear>2020</inceptionYear>
+
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>progrm-jarvis</id>
+            <name>Petr Portnov</name>
+            <email>gh@progrm-jarvis.ru</email>
+            <url>https://github.com/JarvisCraft</url>
+            <roles>
+                <role>Lead developer</role>
+            </roles>
+            <timezone>3</timezone>
+            <properties>
+                <social.telegram>PROgrm_JARvis</social.telegram>
+                <social.vk>PROgrm_JARvis</social.vk>
+                <social.twitter>PROgrm_JARvis</social.twitter>
+            </properties>
+        </developer>
+    </developers>
+
+    <scm>
+        <url>${github.url}</url>
+        <connection>scm:git:git://github.com:${github.coordinate}.git</connection>
+        <developerConnection>scm:git:git@github.com:${github.coordinate}.git</developerConnection>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>${github.url}/issues/</url>
+    </issueManagement>
+
+    <distributionManagement>
+        <repository>
+            <id>sonatype-ossrh</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+        <snapshotRepository>
+            <id>sonatype-ossrh</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <repositories>
+        <!-- spigot-api -->
+        <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+        <!-- minecraft-utils snapshots -->
+        <repository>
+            <id>sonatype-ossrh</id>
+            <url>https://oss.sonatype.org/content/groups/public/</url>
+        </repository>
+    </repositories>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.2.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <tags>
+                        <tag>
+                            <name>apiNote</name>
+                            <placement>a</placement>
+                            <head>API note</head>
+                        </tag>
+                        <tag>
+                            <name>implNote</name>
+                            <placement>a</placement>
+                            <head>Implementation note</head>
+                        </tag>
+                        <tag>
+                            <name>implSpec</name>
+                            <placement>a</placement>
+                            <head>Implementation specification</head>
+                        </tag>
+                    </tags>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.plugins</groupId>
+                <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.8</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>1.6</version>
+            </plugin>
+        </plugins>
+    </build>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- Runtime -->
+            <dependency>
+                <groupId>org.spigotmc</groupId>
+                <artifactId>spigot-api</artifactId>
+                <version>1.16.5-R0.1-SNAPSHOT</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- Libraries -->
+            <dependency>
+                <groupId>ru.progrm-jarvis</groupId>
+                <artifactId>padla</artifactId>
+                <version>${version.padla}</version>
+            </dependency>
+
+            <!-- Code-generation -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>1.18.18</version>
+                <scope>provided</scope>
+                <optional>true</optional>
+            </dependency>
+
+            <!-- Annotations -->
+            <dependency>
+                <groupId>org.jetbrains</groupId>
+                <artifactId>annotations</artifactId>
+                <version>20.1.0</version>
+                <scope>provided</scope>
+                <optional>true</optional>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>
