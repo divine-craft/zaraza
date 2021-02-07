@@ -36,7 +36,7 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
-        <module>zaraza-common</module>
+        <module>zaraza-common-api</module>
     </modules>
 
     <properties>
