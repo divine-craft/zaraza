@@ -29,6 +29,16 @@
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.comphenix.protocol</groupId>
+            <artifactId>ProtocolLib</artifactId>
+        </dependency>
+
+        <!-- Libraries -->
+        <dependency>
+            <groupId>ru.progrm-jarvis.minecraft</groupId>
+            <artifactId>packet-wrapper</artifactId>
+        </dependency>
 
         <!-- Libraries -->
         <dependency>
