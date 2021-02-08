@@ -17,7 +17,6 @@ package ru.divinecraft.zaraza.common.api.sidebar;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import ru.divinecraft.zaraza.common.api.player.MutablePlayerSet;
 import ru.divinecraft.zaraza.common.api.player.PlayerViewed;
 import ru.progrm_jarvis.ultimatemessenger.format.model.TextModel;
 
@@ -41,13 +40,6 @@ public interface Sidebar<L extends Sidebar.@NotNull Line> extends PlayerViewed {
      * @return lines of this sidebar
      */
     @NotNull Lines<L> lines();
-
-    /**
-     * Gets the viewers of this sidebar.
-     *
-     * @return viewers of this sidebar
-     */
-    @NotNull MutablePlayerSet viewers();
 
     /**
      * Line of {@link Sidebar sidebar}.

@@ -37,5 +37,5 @@ import org.jetbrains.annotations.NotNull;
 public interface PlayerViewable extends PlayerViewed {
 
     @Override
-    @NotNull MutablePlayerSet players();
+    @NotNull MutablePlayerSet viewers();
 }

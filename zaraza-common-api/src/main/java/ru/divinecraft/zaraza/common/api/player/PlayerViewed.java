@@ -29,5 +29,5 @@ public interface PlayerViewed {
      * @return players viewing this object
      */
     @Contract(pure = true)
-    @NotNull PlayerSet players();
+    @NotNull PlayerSet viewers();
 }
