@@ -34,6 +34,12 @@
             <artifactId>ProtocolLib</artifactId>
         </dependency>
 
+        <!-- Libraries -->
+        <dependency>
+            <groupId>ru.progrm-jarvis.minecraft</groupId>
+            <artifactId>packet-wrapper</artifactId>
+        </dependency>
+
         <!-- Code-generation -->
         <dependency>
             <groupId>org.projectlombok</groupId>

@@ -198,6 +198,11 @@
                 <artifactId>ultimate-messenger</artifactId>
                 <version>${version.padla}</version>
             </dependency>
+            <dependency>
+                <groupId>ru.progrm-jarvis.minecraft</groupId>
+                <artifactId>packet-wrapper</artifactId>
+                <version>1.16.4-SNAPSHOT</version>
+            </dependency>
 
             <!-- Code-generation -->
             <dependency>
