@@ -16,11 +16,13 @@ package ru.divinecraft.zaraza.common.api.sidebar;
 
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import ru.divinecraft.zaraza.common.api.annotation.BukkitService;
 import ru.progrm_jarvis.ultimatemessenger.format.model.TextModel;
 
 /**
  * Manager of dynamic {@link Player player} sidebars.
  */
+@BukkitService("Zaraza")
 public interface SidebarManager {
 
     /**
