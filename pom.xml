@@ -166,7 +166,7 @@
             <!-- Own modules -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>zaraza-common</artifactId>
+                <artifactId>zaraza-common-api</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
