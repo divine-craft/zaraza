@@ -179,7 +179,12 @@
             <!-- Libraries -->
             <dependency>
                 <groupId>ru.progrm-jarvis</groupId>
-                <artifactId>padla</artifactId>
+                <artifactId>java-commons</artifactId>
+                <version>${version.padla}</version>
+            </dependency>
+            <dependency>
+                <groupId>ru.progrm-jarvis</groupId>
+                <artifactId>ultimate-messenger</artifactId>
                 <version>${version.padla}</version>
             </dependency>
 
