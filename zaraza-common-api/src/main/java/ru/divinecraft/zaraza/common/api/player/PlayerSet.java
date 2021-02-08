@@ -14,6 +14,7 @@
 
 package ru.divinecraft.zaraza.common.api.player;
 
+import com.google.common.collect.UnmodifiableIterator;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.bukkit.entity.Player;
@@ -28,14 +29,24 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
- * {@link Set Set} of {@link Player players}.
+ * Set of {@link Player players}.
  */
 public interface PlayerSet extends PlayerSetMethods {
 
+    /**
+     * Comparator which should be used for comparison of {@link Player players} by {@link PlayerSet player sets}.
+     */
     Comparator<@NotNull Player> PLAYER_COMPARATOR = Comparator
             .<Player>comparingLong(player -> player.getUniqueId().getMostSignificantBits())
             .thenComparingLong(player -> player.getUniqueId().getLeastSignificantBits());
 
+    /**
+     * Gets the {@link Object#hashCode() hash code}  for the given player set
+     * as specified by {@link Set#hashCode()}.
+     *
+     * @param playerSet set of players for which to compute the hash code
+     * @return computed hash code
+     */
     static int hashCodeOf(final @NotNull PlayerSet playerSet) {
         var hashCode = 0;
         for (final var enumeration = playerSet.enumeration(); enumeration.hasMoreElements(); ) hashCode
@@ -44,6 +55,13 @@ public interface PlayerSet extends PlayerSetMethods {
         return hashCode;
     }
 
+    /**
+     * Compares the contents of the given player sets returning {@code true} if and only if they are the same.
+     *
+     * @param left first compared player set
+     * @param right second compared player set
+     * @return {@code true} if contents are equal and {@code false} otherwise
+     */
     static boolean contentsEqual(final @NotNull PlayerSet left, final @NotNull PlayerSet right) {
         if (left.size() != right.size()) return false;
 
@@ -53,28 +71,49 @@ public interface PlayerSet extends PlayerSetMethods {
         return true;
     }
 
+    /**
+     * Checks if this set contains the given player.
+     *
+     * @param player player to check for containment in this set
+     * @return {@code true} if the given player is contained by this set and {@code false} otherwise
+     */
     boolean contains(@NotNull Player player);
 
+    /**
+     * Creates an array containing the players currently contained by this player set.
+     *
+     * @return array of currently contained players
+     */
     @NotNull Player @NotNull [] toArray();
 
+    /**
+     * Checks if this set contains all the players contained by {@code players}.
+     *
+     * @param players players to check for containment in this set
+     * @return {@code true} if all given players are contained by this set and {@code false} otherwise
+     */
     boolean containsAll(@NonNull Collection<@NotNull Player> players);
 
     /**
-     * Gets an unmodifiable view of this set of players.
+     * Gets an unmodifiable {@link Set} view of this set of players.
      *
-     * @return unmodifiable view of this player set
+     * @return unmodifiable {@link Set} view of this player set
      */
     @NotNull @UnmodifiableView Set<@NotNull Player> asUnmodifiableSet();
 
+    /**
+     * Creates an {@link Enumeration enumeration} over this set's {@link Player players}.
+     *
+     * @return {@link Enumeration enumeration} over this set's {@link Player players}
+     */
     @NotNull Enumeration<@NotNull Player> enumeration();
 
-    @NotNull Iterator<@NotNull Player> unmodifiableIterator();
-
-    @NotNull @Unmodifiable Spliterator<@NotNull Player> unmodifiableSpliterator();
-
-    @NotNull Stream<@NotNull Player> unmodifiableStream();
-
-    @NotNull Stream<@NotNull Player> unmodifiableParallelStream();
+    /**
+     * Creates an {@link UnmodifiableIterator unmodifiable iterator} over this set's {@link Player players}.
+     *
+     * @return {@link UnmodifiableIterator unmodifiable iterator} over this set's {@link Player players}
+     */
+    @NotNull UnmodifiableIterator<@NotNull Player> unmodifiableIterator();
 
     /**
      * Creates a new player set consisting of the given player.
@@ -130,13 +169,13 @@ public interface PlayerSet extends PlayerSetMethods {
     }
 
     /**
-     * Creates a new player set consisting of the given players
-     * assuming that {@code players} is naturally ordered and does not get mutated while created player set is accessed.
+     * Creates a new player set consisting of the given players assuming that {@code players}
+     * is {@link #PLAYER_COMPARATOR ordered} and does not get mutated while created player set is accessed.
      *
      * @param players array of players which will be stored in the given set
      * @return created player set
      *
-     * @apiNote the behaviour is undefined if {@code players} is not naturally ordered
+     * @apiNote the behaviour is undefined if {@code players} is not {@link #PLAYER_COMPARATOR ordered}
      * @apiNote the behaviour is undefined if any method of the created set
      * gets called after mutation of {@code players}
      */
@@ -147,21 +186,21 @@ public interface PlayerSet extends PlayerSetMethods {
     }
 
     /**
-     * Creates a new player set consisting of the given players
-     * assuming that {@code players} is naturally ordered.
+     * Creates a new player set consisting of the given players assuming that {@code players}
+     * is {@link #PLAYER_COMPARATOR ordered}.
      *
      * @param players array of players which will be stored in the given set
      * @return created player set
      *
-     * @apiNote the behaviour is undefined if {@code players} is not naturally ordered
+     * @apiNote the behaviour is undefined if {@code players} is not {@link #PLAYER_COMPARATOR ordered}
      */
     static @NotNull PlayerSet ofSortedCopy(final @NotNull Player @NonNull [] players) {
         return ofSorted(players.clone());
     }
 
     /**
-     * Creates a new player set consisting of the given players
-     * assuming that {@code players} is naturally ordered.
+     * Creates a new player set consisting of the given players assuming that {@code players}
+     * is {@link #PLAYER_COMPARATOR ordered}.
      *
      * @param players collection of players which will be stored in the given set
      * @return created player set
@@ -217,23 +256,28 @@ public interface PlayerSet extends PlayerSetMethods {
         }
 
         @Override
-        public @NotNull Iterator<@NotNull Player> unmodifiableIterator() {
+        public @NotNull UnmodifiableIterator<@NotNull Player> unmodifiableIterator() {
             return new SimpleIterator();
         }
 
         @Override
-        public @NotNull @Unmodifiable Spliterator<@NotNull Player> unmodifiableSpliterator() {
+        public @NotNull Spliterator<@NotNull Player> spliterator() {
             return new SimpleSpliterator();
         }
 
         @Override
-        public @NotNull Stream<@NotNull Player> unmodifiableStream() {
+        public @NotNull Stream<@NotNull Player> stream() {
             return Stream.of(player);
         }
 
         @Override
-        public @NotNull Stream<@NotNull Player> unmodifiableParallelStream() {
+        public @NotNull Stream<@NotNull Player> parallelStream() {
             return Stream.of(player);
+        }
+
+        @Override
+        public void forEach(final @NonNull Consumer<? super @NotNull Player> action) {
+            action.accept(player);
         }
 
         @Override
@@ -278,7 +322,7 @@ public interface PlayerSet extends PlayerSetMethods {
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         @FieldDefaults(level = AccessLevel.PRIVATE)
-        private final class SimpleIterator implements Iterator<@NotNull Player> {
+        private final class SimpleIterator extends UnmodifiableIterator<@NotNull Player> {
 
             /**
              * Flag indicating if {@link #next()} was called
@@ -414,23 +458,28 @@ public interface PlayerSet extends PlayerSetMethods {
         }
 
         @Override
-        public @NotNull Iterator<@NotNull Player> unmodifiableIterator() {
+        public @NotNull UnmodifiableIterator<@NotNull Player> unmodifiableIterator() {
             return new SimpleIterator();
         }
 
         @Override
-        public @NotNull @Unmodifiable Spliterator<@NotNull Player> unmodifiableSpliterator() {
+        public @NotNull Spliterator<@NotNull Player> spliterator() {
             return Spliterators.spliterator(array, Spliterator.IMMUTABLE | Spliterator.ORDERED);
         }
 
         @Override
-        public @NotNull Stream<@NotNull Player> unmodifiableStream() {
-            return StreamSupport.stream(unmodifiableSpliterator(), false);
+        public @NotNull Stream<@NotNull Player> stream() {
+            return StreamSupport.stream(spliterator(), false);
         }
 
         @Override
-        public @NotNull Stream<@NotNull Player> unmodifiableParallelStream() {
-            return StreamSupport.stream(unmodifiableSpliterator(), true);
+        public @NotNull Stream<@NotNull Player> parallelStream() {
+            return StreamSupport.stream(spliterator(), true);
+        }
+
+        @Override
+        public void forEach(final @NonNull Consumer<? super @NotNull Player> action) {
+            for (val player : array) action.accept(player);
         }
 
         @Override
@@ -466,7 +515,7 @@ public interface PlayerSet extends PlayerSetMethods {
 
         @NoArgsConstructor(access = AccessLevel.PRIVATE)
         @FieldDefaults(level = AccessLevel.PRIVATE)
-        private final class SimpleIterator implements Iterator<@NotNull Player> {
+        private final class SimpleIterator extends UnmodifiableIterator<@NotNull Player> {
 
             int nextIndex; // default-initialized to 0
 

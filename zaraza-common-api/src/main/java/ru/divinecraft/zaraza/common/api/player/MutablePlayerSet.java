@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.Flow;
+import java.util.function.Consumer;
 
 /**
  * Mutable {@link Player set of players}.
@@ -33,13 +34,43 @@ import java.util.concurrent.Flow;
 public interface MutablePlayerSet
         extends PlayerSet, MutablePlayerSetMethods, Flow.Publisher<MutablePlayerSet.@NotNull Update> {
 
-    void remove(@NotNull Player player);
+    /**
+     * Removes the specified player from this set.
+     *
+     * @param player player removed from this set
+     * @return {@code true} if this set changed as the result of this call and {@code false} otherwise
+     */
+    boolean remove(@NotNull Player player);
 
+    /**
+     * Gets a {@link Set} view of this set of players.
+     *
+     * @return {@link Set} view of this player set
+     */
     @NotNull Set<@NotNull Player> asSet();
 
+    /**
+     * Keeps only the specified players in set.
+     *
+     * @param players only players kept in this set
+     * @return {@code true} if this set changed as the result of this call and {@code false} otherwise
+     *
+     * @throws NullPointerException if {@code players} is {@code null}
+     */
     boolean retainAll(@NonNull Collection<@NotNull Player> players);
 
+    /**
+     * Removes all specified players from this set.
+     *
+     * @param players players removed from this set
+     * @return {@code true} if this set changed as the result of this call and {@code false} otherwise
+     *
+     * @throws NullPointerException if {@code players} is {@code null}
+     */
     boolean removeAll(@NonNull Collection<@NotNull Player> players);
+
+    @Override // this is required to resolve conflict with the same yet abstract method in PlayerSetMethods
+    void forEach(@NonNull Consumer<? super @NotNull Player> action);
 
     /**
      * Update event of a {@link PlayerSet set of players}

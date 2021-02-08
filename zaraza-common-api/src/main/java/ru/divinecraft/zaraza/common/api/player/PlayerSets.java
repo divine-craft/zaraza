@@ -14,6 +14,7 @@
 
 package ru.divinecraft.zaraza.common.api.player;
 
+import com.google.common.collect.UnmodifiableIterator;
 import lombok.*;
 import lombok.experimental.Delegate;
 import lombok.experimental.FieldDefaults;
@@ -29,8 +30,7 @@ import ru.divinecraft.zaraza.common.api.player.MutablePlayerSet.Update;
 import java.util.*;
 import java.util.concurrent.Flow;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import java.util.function.Predicate;
 
 import static ru.divinecraft.zaraza.common.api.player.MutablePlayerSet.Update.Action.ADD;
 import static ru.divinecraft.zaraza.common.api.player.MutablePlayerSet.Update.Action.REMOVE;
@@ -71,7 +71,7 @@ public class PlayerSets {
     @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
     private static final class UncheckedPlayerSetWrapper implements PlayerSet {
 
-        @Delegate(types = PlayerSetMethods.class)
+        @Delegate(types = {Iterable.class, PlayerSetMethods.class, MutablePlayerSetMethods.class})
         @NotNull @Unmodifiable Set<@NotNull Player> set;
 
         @Override
@@ -100,23 +100,8 @@ public class PlayerSets {
         }
 
         @Override
-        public @NotNull Iterator<@NotNull Player> unmodifiableIterator() {
+        public @NotNull UnmodifiableIterator<@NotNull Player> unmodifiableIterator() {
             return new UnmodifiablePlayerIterator(set.iterator());
-        }
-
-        @Override
-        public @NotNull @Unmodifiable Spliterator<@NotNull Player> unmodifiableSpliterator() {
-            return Spliterators.spliterator(set, Spliterator.DISTINCT | Spliterator.IMMUTABLE);
-        }
-
-        @Override
-        public @NotNull Stream<@NotNull Player> unmodifiableStream() {
-            return StreamSupport.stream(unmodifiableSpliterator(), false);
-        }
-
-        @Override
-        public @NotNull Stream<@NotNull Player> unmodifiableParallelStream() {
-            return StreamSupport.stream(unmodifiableSpliterator(), true);
         }
     }
 
@@ -203,6 +188,27 @@ public class PlayerSets {
         }
 
         @Override
+        public boolean removeIf(final @NonNull Predicate<? super @NotNull Player> filter) {
+            SortedSet<Player> removedPlayers = null;
+
+            for (final var iterator = set.iterator(); iterator.hasNext(); ) {
+                final Player player;
+                if (filter.test(player = iterator.next())) {
+                    iterator.remove();
+
+                    if (removedPlayers == null) removedPlayers = new TreeSet<>(PlayerSet.PLAYER_COMPARATOR);
+                    removedPlayers.add(player);
+                }
+            }
+
+            if (removedPlayers == null) return false;
+
+            subscriber.onNext(Update.create(REMOVE, PlayerSet.ofSorted(removedPlayers)));
+
+            return true;
+        }
+
+        @Override
         @SuppressWarnings("SuspiciousMethodCalls") // the way this method works
         public boolean removeAll(final @NonNull Collection<?> removed) {
             SortedSet<Player> removedPlayers = null;
@@ -262,7 +268,7 @@ public class PlayerSets {
         /**
          * {@link Set Set} to which all root operations are delegated
          */
-        @Delegate(types = MutablePlayerSetMethods.class)
+        @Delegate(types = {Iterable.class, PlayerSetMethods.class, MutablePlayerSetMethods.class})
         @NotNull Set<@NotNull Player> set;
 
         /**
@@ -304,8 +310,8 @@ public class PlayerSets {
         // Methods of MutablePlayerSet unavailable via MutablePlayerSetMethods
 
         @Override
-        public void remove(@NotNull final Player player) {
-            set.remove(player);
+        public boolean remove(@NotNull final Player player) {
+            return set.remove(player);
         }
 
         @Override
@@ -331,23 +337,8 @@ public class PlayerSets {
         }
 
         @Override
-        public @NotNull Iterator<@NotNull Player> unmodifiableIterator() {
+        public @NotNull UnmodifiableIterator<@NotNull Player> unmodifiableIterator() {
             return new UnmodifiablePlayerIterator(set.iterator());
-        }
-
-        @Override
-        public @NotNull @Unmodifiable Spliterator<@NotNull Player> unmodifiableSpliterator() {
-            return Spliterators.spliterator(set, Spliterator.DISTINCT | Spliterator.IMMUTABLE);
-        }
-
-        @Override
-        public @NotNull Stream<@NotNull Player> unmodifiableStream() {
-            return StreamSupport.stream(unmodifiableSpliterator(), false);
-        }
-
-        @Override
-        public @NotNull Stream<@NotNull Player> unmodifiableParallelStream() {
-            return StreamSupport.stream(unmodifiableSpliterator(), true);
         }
 
         // Conversion to modifiable view
@@ -364,7 +355,7 @@ public class PlayerSets {
      */
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-    private static final class UnmodifiablePlayerIterator implements @Unmodifiable Iterator<@NotNull Player> {
+    private static final class UnmodifiablePlayerIterator extends UnmodifiableIterator<@NotNull Player> {
 
         /**
          * {@link Iterator Iterator} to which all read-logic is delegated

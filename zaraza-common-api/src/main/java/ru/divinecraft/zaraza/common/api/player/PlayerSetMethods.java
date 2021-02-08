@@ -14,13 +14,61 @@
 
 package ru.divinecraft.zaraza.common.api.player;
 
+import lombok.NonNull;
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Spliterator;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
+
 /**
  * This is a super-interface of {@link PlayerSet}
  * representing its methods overlapping with {@link java.util.Set}.
  */
 public interface PlayerSetMethods {
 
+    /**
+     * Gets the size of this set of players.
+     *
+     * @return size of this set of players
+     */
     int size();
 
+    /**
+     * Checks if this set is empty.
+     *
+     * @return {@code true} if this set os empty and {@code false} otherwise
+     */
     boolean isEmpty();
+
+    /**
+     * Creates a {@link Spliterator spliterator} over this set's {@link Player players}.
+     *
+     * @return {@link Spliterator spliterator} over this set's {@link Player players}
+     */
+    @NotNull Spliterator<@NotNull Player> spliterator();
+
+    /**
+     * Creates a {@link Stream stream} over this set's {@link Player players}.
+     *
+     * @return {@link Stream stream} over this set's {@link Player players}
+     */
+    @NotNull Stream<@NotNull Player> stream();
+
+    /**
+     * Creates a parallel {@link Stream stream} over this set's {@link Player players}.
+     *
+     * @return parallel {@link Stream stream} over this set's {@link Player players}
+     */
+    @NotNull Stream<@NotNull Player> parallelStream();
+
+    /**
+     * Applies the given action to each element of this set.
+     *
+     *  @param action action to be applied to each element of this set
+     *
+     * @throws NullPointerException if {@code action} is {@code null}
+     */
+    void forEach(@NonNull Consumer<? super @NotNull Player> action);
 }

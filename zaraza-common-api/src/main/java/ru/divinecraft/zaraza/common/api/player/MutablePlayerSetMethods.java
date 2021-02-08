@@ -19,25 +19,52 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.Spliterator;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 /**
  * This is a super-interface of {@link MutablePlayerSet}
  * representing its methods overlapping with {@link java.util.Set}.
  */
-public interface MutablePlayerSetMethods extends PlayerSetMethods {
+public interface MutablePlayerSetMethods extends PlayerSetMethods, Iterable<@NotNull Player> {
 
+    /**
+     * Clears this set.
+     */
     void clear();
 
+    /**
+     * Adds the specified player to this set.
+     *
+     * @param player player added to this set
+     * @return {@code true} if this set changed as the result of this call and {@code false} otherwise
+     */
     boolean add(@NotNull Player player);
 
-    @NotNull Iterator<@NotNull Player> iterator();
-
+    /**
+     * Adds all specified players to this set.
+     *
+     * @param players players added to this set
+     * @return {@code true} if this set changed as the result of this call and {@code false} otherwise
+     *
+     * @throws NullPointerException if {@code players} is {@code null}
+     */
     boolean addAll(@NonNull Collection<? extends Player> players);
 
+    /**
+     * Removes all players for which the filter returns {@code true}.
+     *
+     * @param filter filter checking which players to remove
+     * @return {@code true} if this set changed as the result of this call and {@code false} otherwise
+     *
+     * @throws NullPointerException if {@code filter} is {@code null}
+     */
+    boolean removeIf(@NonNull Predicate<? super @NotNull Player> filter);
+
+    @Override // this is required to resolve conflict with the same yet abstract method in PlayerSetMethods
     @NotNull Spliterator<@NotNull Player> spliterator();
 
-    boolean removeIf(@NonNull Predicate<? super @NotNull Player> filter);
+    @Override // this is required to resolve conflict with the same yet abstract method in PlayerSetMethods
+    void forEach(@NonNull Consumer<? super @NotNull Player> action);
 }
