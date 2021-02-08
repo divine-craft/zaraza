@@ -12,7 +12,9 @@
  * limitations under the License.
  */
 
-/**
- * API for creating dynamic extensible {@link ru.divinecraft.zaraza.common.api.sidebar.Sidebar player sidebars}.
- */
 package ru.divinecraft.zaraza.common.api.sidebar;
+
+import org.jetbrains.annotations.NotNull;
+import ru.divinecraft.zaraza.common.api.player.PlayerViewable;
+
+public interface ViewableSidebar<L extends Sidebar.@NotNull Line> extends Sidebar<L>, PlayerViewable {}

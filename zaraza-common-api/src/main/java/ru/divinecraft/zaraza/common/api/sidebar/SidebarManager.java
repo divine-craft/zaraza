@@ -12,7 +12,22 @@
  * limitations under the License.
  */
 
-/**
- * API for creating dynamic extensible {@link ru.divinecraft.zaraza.common.api.sidebar.Sidebar player sidebars}.
- */
 package ru.divinecraft.zaraza.common.api.sidebar;
+
+import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
+import ru.progrm_jarvis.ultimatemessenger.format.model.TextModel;
+
+/**
+ * Manager of dynamic {@link Player player} sidebars.
+ */
+public interface SidebarManager {
+
+    /**
+     * Creates a new dynamic sidebar with the given title.
+     *
+     * @param title title of the created sidebar
+     * @return created sidebar
+     */
+    @NotNull MutableSidebar<@NotNull ?> createSidebar(@NotNull TextModel<@NotNull Player> title);
+}
