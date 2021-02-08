@@ -24,14 +24,22 @@
     <artifactId>zaraza-common</artifactId>
 
     <dependencies>
+        <!-- Runtime -->
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
         </dependency>
 
+        <!-- Code-generation -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+        </dependency>
+
+        <!-- Annotations -->
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
         </dependency>
     </dependencies>
 </project>
