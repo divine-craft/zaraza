@@ -30,6 +30,12 @@
             <artifactId>spigot-api</artifactId>
         </dependency>
 
+        <!-- Libraries -->
+        <dependency>
+            <groupId>ru.progrm-jarvis</groupId>
+            <artifactId>ultimate-messenger</artifactId>
+        </dependency>
+
         <!-- Code-generation -->
         <dependency>
             <groupId>org.projectlombok</groupId>
