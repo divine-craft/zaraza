@@ -21,7 +21,6 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
-import java.util.Set;
 import java.util.concurrent.Flow;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -120,7 +119,8 @@ class PlayerSetsTest {
         assertFalse(set.contains(jack));
         assertFalse(set.contains(bob));
         assertFalse(set.contains(joper));
-        verify(subscriber).onNext(eq(MutablePlayerSet.Update.of(MutablePlayerSet.Update.Action.ADD, Set.of(john))));
+        verify(subscriber)
+                .onNext(eq(MutablePlayerSet.Update.create(MutablePlayerSet.Update.Action.ADD, PlayerSet.of(john))));
 
         assertFalse(set.isEmpty());
         assertEquals(1, set.size());
@@ -129,10 +129,12 @@ class PlayerSetsTest {
         assertFalse(set.contains(bob));
         assertFalse(set.contains(joper));
         // no extra publish should happen
-        verify(subscriber).onNext(eq(MutablePlayerSet.Update.of(MutablePlayerSet.Update.Action.ADD, Set.of(john))));
+        verify(subscriber)
+                .onNext(eq(MutablePlayerSet.Update.create(MutablePlayerSet.Update.Action.ADD, PlayerSet.of(john))));
 
         set.remove(john);
-        verify(subscriber).onNext(eq(MutablePlayerSet.Update.of(MutablePlayerSet.Update.Action.REMOVE, Set.of(john))));
+        verify(subscriber)
+                .onNext(eq(MutablePlayerSet.Update.create(MutablePlayerSet.Update.Action.REMOVE, PlayerSet.of(john))));
         assertTrue(set.isEmpty());
         assertEquals(0, set.size());
         assertFalse(set.contains(john));
@@ -141,7 +143,8 @@ class PlayerSetsTest {
         assertFalse(set.contains(joper));
 
         set.add(jack);
-        verify(subscriber).onNext(eq(MutablePlayerSet.Update.of(MutablePlayerSet.Update.Action.ADD, Set.of(jack))));
+        verify(subscriber)
+                .onNext(eq(MutablePlayerSet.Update.create(MutablePlayerSet.Update.Action.ADD, PlayerSet.of(jack))));
         assertFalse(set.isEmpty());
         assertEquals(1, set.size());
         assertFalse(set.contains(john));
@@ -150,7 +153,8 @@ class PlayerSetsTest {
         assertFalse(set.contains(joper));
 
         set.add(john);
-        verify(subscriber).onNext(eq(MutablePlayerSet.Update.of(MutablePlayerSet.Update.Action.ADD, Set.of(jack))));
+        verify(subscriber)
+                .onNext(eq(MutablePlayerSet.Update.create(MutablePlayerSet.Update.Action.ADD, PlayerSet.of(jack))));
         assertFalse(set.isEmpty());
         assertEquals(2, set.size());
         assertTrue(set.contains(john));

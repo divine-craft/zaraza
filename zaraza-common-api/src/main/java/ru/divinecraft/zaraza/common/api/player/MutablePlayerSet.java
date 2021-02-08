@@ -22,10 +22,8 @@ import lombok.experimental.Accessors;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.Flow;
 
@@ -62,7 +60,7 @@ public interface MutablePlayerSet
          * @return updated players
          */
         @Contract(pure = true)
-        @NotNull @Unmodifiable Collection<@NotNull Player> players();
+        @NotNull PlayerSet players();
 
         /**
          * Creates a new player set update with the given values.
@@ -71,22 +69,7 @@ public interface MutablePlayerSet
          * @param players the updated players
          * @return created player set update
          */
-        static @NotNull Update of(final @NotNull Action action,
-                                  final @NotNull Set<@NotNull Player> players) {
-            return ofUnmodifiable(action, Collections.unmodifiableSet(players));
-        }
-
-        /**
-         * Creates a new player set update with the given values assuming that all data is unmodifiable.
-         *
-         * @param action action performed by this update
-         * @param players unmodifiable set of the updated players
-         * @return created player set update
-         *
-         * @apiNote the behaviour is undefined if {@code players} is modifiable and gets modified
-         */
-        static @NotNull Update ofUnmodifiable(final @NotNull Action action,
-                                              final @NotNull @Unmodifiable Set<@NotNull Player> players) {
+        static @NotNull Update create(final @NotNull Action action, final @NotNull PlayerSet players) {
             return new SimpleUpdate(action, players);
         }
 
@@ -121,6 +104,6 @@ public interface MutablePlayerSet
         /**
          * The updated player
          */
-        @NotNull @Unmodifiable Set<@NotNull Player> players;
+        @NotNull PlayerSet players;
     }
 }

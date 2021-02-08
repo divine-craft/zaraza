@@ -24,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jetbrains.annotations.UnmodifiableView;
+import ru.divinecraft.zaraza.common.api.player.MutablePlayerSet.Update;
 
 import java.util.*;
 import java.util.concurrent.Flow;
@@ -31,7 +32,8 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import static ru.divinecraft.zaraza.common.api.player.MutablePlayerSet.Update.Action.*;
+import static ru.divinecraft.zaraza.common.api.player.MutablePlayerSet.Update.Action.ADD;
+import static ru.divinecraft.zaraza.common.api.player.MutablePlayerSet.Update.Action.REMOVE;
 
 /**
  * Helper methods for {@link PlayerSet player sets}.
@@ -45,12 +47,77 @@ public class PlayerSets {
     private static final @NotNull Player @NotNull [] EMPTY_PLAYER_ARRAY = new Player[0];
 
     /**
+     * Wraps the given {@link Set} of {@link Player players} into a {@link PlayerSet player set}.
+     *
+     * @param set set to be wrapped
+     * @return wrapped {@link Set} of {@link Player players}
+     *
+     * @apiNote the behaviour of the created set's methods is undefined if the original set gets mutated
+     */
+    public @NotNull PlayerSet wrapToPlayerSet(final @NonNull @Unmodifiable Set<@NotNull Player> set) {
+        return new UncheckedPlayerSetWrapper(set);
+    }
+
+    /**
      * Creates a new {@link MutablePlayerSet mutable player set}.
      *
      * @return newly created player set
      */
     public @NotNull MutablePlayerSet newMutablePlayerSet() {
         return DelegatingMutablePlayerSet.wrap(new HashSet<>());
+    }
+
+    @AllArgsConstructor(access = AccessLevel.PRIVATE)
+    @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+    private static final class UncheckedPlayerSetWrapper implements PlayerSet {
+
+        @Delegate(types = PlayerSetMethods.class)
+        @NotNull @Unmodifiable Set<@NotNull Player> set;
+
+        @Override
+        public boolean contains(@NotNull final Player player) {
+            return set.contains(player);
+        }
+
+        @Override
+        public @NotNull Player @NotNull [] toArray() {
+            return set.toArray(EMPTY_PLAYER_ARRAY);
+        }
+
+        @Override
+        public boolean containsAll(final @NonNull Collection<@NotNull Player> players) {
+            return set.containsAll(players);
+        }
+
+        @Override
+        public @NotNull @UnmodifiableView Set<@NotNull Player> asUnmodifiableSet() {
+            return set;
+        }
+
+        @Override
+        public @NotNull Enumeration<@NotNull Player> enumeration() {
+            return Collections.enumeration(set);
+        }
+
+        @Override
+        public @NotNull Iterator<@NotNull Player> unmodifiableIterator() {
+            return new UnmodifiablePlayerIterator(set.iterator());
+        }
+
+        @Override
+        public @NotNull @Unmodifiable Spliterator<@NotNull Player> unmodifiableSpliterator() {
+            return Spliterators.spliterator(set, Spliterator.DISTINCT | Spliterator.IMMUTABLE);
+        }
+
+        @Override
+        public @NotNull Stream<@NotNull Player> unmodifiableStream() {
+            return StreamSupport.stream(unmodifiableSpliterator(), false);
+        }
+
+        @Override
+        public @NotNull Stream<@NotNull Player> unmodifiableParallelStream() {
+            return StreamSupport.stream(unmodifiableSpliterator(), true);
+        }
     }
 
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -66,7 +133,7 @@ public class PlayerSets {
         /**
          * Subscriber to which all updates get published
          */
-        @NotNull Flow.Subscriber<MutablePlayerSet.@NotNull Update> subscriber;
+        @NotNull Flow.Subscriber<@NotNull Update> subscriber;
 
         // Non-generic non-mutating operations
 
@@ -85,28 +152,23 @@ public class PlayerSets {
             return set.toArray();
         }
 
-        // Mutating operations
+        @Override
+        public <T> @NotNull T @NotNull [] toArray(final @NonNull T[] array) {
+            //noinspection SuspiciousToArrayCall: verified aboce
+            return set.toArray(array);
+        }
+
+        // Basic mutating operations
 
         @Override
         public @NotNull Iterator<@NotNull Player> iterator() {
             return new PublishingPlayerIterator(set.iterator(), subscriber);
         }
 
-        @NotNull
-        @Override
-        public <T> T[] toArray(final @NonNull T[] array) {
-            if (!Player[].class.isAssignableFrom(array.getClass())) throw new ArrayStoreException(
-                    "Cannot store Players in array of " + array.getClass().getComponentType()
-            );
-
-            //noinspection SuspiciousToArrayCall: verified aboce
-            return set.toArray(array);
-        }
-
         @Override
         public boolean add(final @NotNull Player player) {
             final boolean updated;
-            if (updated = set.add(player)) subscriber.onNext(MutablePlayerSet.Update.of(ADD, Set.of(player)));
+            if (updated = set.add(player)) subscriber.onNext(Update.create(ADD, PlayerSet.of(player)));
 
             return updated;
         }
@@ -117,10 +179,76 @@ public class PlayerSets {
             if (updated = set.remove(entry)) {
                 assert entry instanceof Player
                         : "entry should be of type Player as it was remove from set of Players";
-                subscriber.onNext(MutablePlayerSet.Update.of(REMOVE, Set.of((Player) entry)));
+                subscriber.onNext(Update.create(REMOVE, PlayerSet.of((Player) entry)));
             }
 
             return updated;
+        }
+
+        // Bulk operations
+
+        @Override
+        public boolean addAll(final @NonNull Collection<? extends @NotNull Player> added) {
+            SortedSet<Player> addedPlayers = null;
+            for (val entry : added) if (set.add(entry)) {
+                if (addedPlayers == null) addedPlayers = new TreeSet<>(PlayerSet.PLAYER_COMPARATOR);
+                addedPlayers.add(entry);
+            }
+
+            if (addedPlayers == null) return false;
+
+            subscriber.onNext(Update.create(ADD, PlayerSet.ofSorted(addedPlayers)));
+
+            return true;
+        }
+
+        @Override
+        @SuppressWarnings("SuspiciousMethodCalls") // the way this method works
+        public boolean removeAll(final @NonNull Collection<?> removed) {
+            SortedSet<Player> removedPlayers = null;
+
+            // use smaller collection for iteration
+            if (size() <= removed.size()) for (final var iterator = set.iterator(); iterator.hasNext(); ) {
+                final Player player;
+                if (removed.contains(player = iterator.next())) {
+                    iterator.remove();
+
+                    if (removedPlayers == null) removedPlayers = new TreeSet<>(PlayerSet.PLAYER_COMPARATOR);
+                    removedPlayers.add(player);
+                }
+            } else for (val entry : removed) if (set.remove(entry)) {
+                assert entry instanceof Player
+                        : "entry should be of type Player as it was removed from the set containing Players";
+
+                if (removedPlayers == null) removedPlayers = new TreeSet<>(PlayerSet.PLAYER_COMPARATOR);
+                removedPlayers.add((Player) entry);
+            }
+
+            if (removedPlayers == null) return false;
+
+            subscriber.onNext(Update.create(REMOVE, PlayerSet.ofSorted(removedPlayers)));
+
+            return true;
+        }
+
+        @Override
+        public boolean retainAll(final @NonNull Collection<?> kept) {
+            SortedSet<Player> removedPlayers = null;
+            for (final var iterator = set.iterator(); iterator.hasNext(); ) {
+                final Player player;
+                if (!kept.contains(player = iterator.next())) {
+                    iterator.remove();
+
+                    if (removedPlayers == null) removedPlayers = new TreeSet<>(PlayerSet.PLAYER_COMPARATOR);
+                    removedPlayers.add(player);
+                }
+            }
+
+            if (removedPlayers == null) return false;
+
+            subscriber.onNext(Update.create(REMOVE, PlayerSet.ofSorted(removedPlayers)));
+
+            return true;
         }
     }
 
@@ -169,7 +297,7 @@ public class PlayerSets {
         }
 
         @Override
-        public boolean containsAll(final @NonNull Collection<Player> players) {
+        public boolean containsAll(final @NonNull Collection<@NotNull Player> players) {
             return set.containsAll(players);
         }
 
@@ -213,12 +341,12 @@ public class PlayerSets {
         }
 
         @Override
-        public @NotNull @Unmodifiable Stream<@NotNull Player> unmodifiableStream() {
+        public @NotNull Stream<@NotNull Player> unmodifiableStream() {
             return StreamSupport.stream(unmodifiableSpliterator(), false);
         }
 
         @Override
-        public @NotNull @Unmodifiable Stream<@NotNull Player> unmodifiableParallelStream() {
+        public @NotNull Stream<@NotNull Player> unmodifiableParallelStream() {
             return StreamSupport.stream(unmodifiableSpliterator(), true);
         }
 
@@ -274,7 +402,7 @@ public class PlayerSets {
         /**
          * Subscriber being notified on modifications.
          */
-        @NotNull Flow.Subscriber<MutablePlayerSet.@NotNull Update> subscriber;
+        @NotNull Flow.Subscriber<@NotNull Update> subscriber;
 
         @NonFinal @Nullable Player last;
 
@@ -295,7 +423,7 @@ public class PlayerSets {
             val thisLast = last;
             assert thisLast != null : "last cannot be null as something was removed from iterator of non-null Players";
 
-            subscriber.onNext(MutablePlayerSet.Update.ofUnmodifiable(REMOVE, Set.of(thisLast)));
+            subscriber.onNext(Update.create(REMOVE, PlayerSet.of(thisLast)));
         }
 
         @Override
