@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 import org.jetbrains.annotations.UnmodifiableView;
+import ru.divinecraft.zaraza.common.api.flow.FlowProcessors;
 import ru.divinecraft.zaraza.common.api.player.MutablePlayerSet.Update;
 
 import java.util.*;
@@ -286,7 +287,7 @@ public class PlayerSets {
         public static @NotNull MutablePlayerSet wrap(final @NotNull Set<@NotNull Player> set) {
             final Flow.Processor<@NotNull Update, @NotNull Update> processor;
             return new DelegatingMutablePlayerSet(
-                    new PublishingPlayerSetWrapper(set, processor = ThreadUnsafeProcessor.create()), processor
+                    new PublishingPlayerSetWrapper(set, processor = FlowProcessors.createProcessor()), processor
             );
         }
 
@@ -420,63 +421,6 @@ public class PlayerSets {
         @Override
         public void forEachRemaining(final @NotNull Consumer<? super @NotNull Player> action) {
             set.forEachRemaining(action);
-        }
-    }
-
-    /**
-     * Simple {@link Flow.Processor processor} for which no concurrency guarantees are given.
-     *
-     * @param <T> type of processed values
-     */
-    @AllArgsConstructor(access = AccessLevel.PRIVATE)
-    @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-    private static final class ThreadUnsafeProcessor<T> implements Flow.Processor<T, T> {
-
-        /**
-         * All subscribers of this processor
-         */
-        @NotNull Set<Flow.@NotNull Subscriber<? super T>> subscribers;
-
-        @Override
-        public void subscribe(final Flow.Subscriber<? super T> subscriber) {
-            if (subscribers.add(subscriber)) subscriber.onSubscribe(new Flow.Subscription() {
-                @Override
-                public void request(final long amount) {} // no-op
-
-                @Override
-                public void cancel() {
-                    subscribers.remove(subscriber);
-                }
-            });
-        }
-
-        @Override
-        public void onSubscribe(final Flow.Subscription subscription) {} // no-op
-
-        @Override
-        public void onNext(final T item) {
-            for (val subscriber : subscribers) subscriber.onNext(item);
-        }
-
-        @Override
-        public void onError(final Throwable error) {
-            for (val subscriber : subscribers) subscriber.onError(error);
-        }
-
-        @Override
-        public void onComplete() {
-            for (val subscriber : subscribers) subscriber.onComplete();
-        }
-
-        /**
-         * Creates a new {@link Flow.Processor processor}.
-         *
-         * @param <T> type of processed values
-         *
-         * @return created {@link Flow.Processor processor}
-         */
-        public static <T> Flow.@NotNull Processor<T, T> create() {
-            return new ThreadUnsafeProcessor<>(new HashSet<>());
         }
     }
 }
