@@ -163,6 +163,13 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- Own modules -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>zaraza-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
             <!-- Runtime -->
             <dependency>
                 <groupId>org.spigotmc</groupId>
