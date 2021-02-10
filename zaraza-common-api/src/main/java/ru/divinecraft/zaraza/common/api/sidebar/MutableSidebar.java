@@ -26,10 +26,7 @@ import java.util.concurrent.Flow;
 public interface MutableSidebar<L extends MutableSidebar.@NotNull MutableLine> extends ViewableSidebar<L> {
 
     @Override
-    @NotNull Flow.Processor<
-            ? extends @NotNull TextModel<? extends @NotNull Player>,
-            ? extends @NotNull TextModel<? extends @NotNull Player>
-            > title();
+    @NotNull Flow.Processor<@NotNull TextModel<@NotNull Player>, @NotNull TextModel<@NotNull Player>> title();
 
     /**
      * Mutable {@link Sidebar.Line sidebar line}.
@@ -37,10 +34,7 @@ public interface MutableSidebar<L extends MutableSidebar.@NotNull MutableLine> e
     interface MutableLine extends Line {
 
         @Override
-        @NotNull Flow.Processor<
-                ? extends @NotNull TextModel<? extends @NotNull Player>,
-                ? extends @NotNull TextModel<? extends @NotNull Player>
-                > text();
+        @NotNull Flow.Processor<@NotNull TextModel<@NotNull Player>, @NotNull TextModel<@NotNull Player>> text();
 
         @Override
         @NotNull Flow.Processor<@NotNull Integer, @NotNull Integer> value();

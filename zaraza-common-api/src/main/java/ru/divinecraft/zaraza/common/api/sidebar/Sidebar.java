@@ -32,7 +32,7 @@ public interface Sidebar<L extends Sidebar.@NotNull Line> extends PlayerViewed {
      *
      * @return title of this sidebar
      */
-    @NotNull Flow.Publisher<? extends @NotNull TextModel<? extends @NotNull Player>> title();
+    @NotNull Flow.Publisher<@NotNull TextModel<@NotNull Player>> title();
 
     /**
      * Gets the lines of this sidebar.
@@ -51,7 +51,7 @@ public interface Sidebar<L extends Sidebar.@NotNull Line> extends PlayerViewed {
          *
          * @return text of this line
          */
-        @NotNull Flow.Publisher<? extends @NotNull TextModel<? extends @NotNull Player>> text();
+        @NotNull Flow.Publisher<@NotNull TextModel<@NotNull Player>> text();
 
         /**
          * Gets the value of this line.
@@ -84,7 +84,7 @@ public interface Sidebar<L extends Sidebar.@NotNull Line> extends PlayerViewed {
          * or equal to the {@link #count() count}.
          */
         @Contract(pure = true)
-        @NotNull L at(byte index);
+        @NotNull L at(int index);
     }
 }
 
