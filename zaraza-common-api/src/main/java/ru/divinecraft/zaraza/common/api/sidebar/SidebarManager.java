@@ -22,7 +22,7 @@ import ru.progrm_jarvis.ultimatemessenger.format.model.TextModel;
 /**
  * Manager of dynamic {@link Player player} sidebars.
  */
-@BukkitService("Zaraza")
+@BukkitService("ZarazaCommon")
 public interface SidebarManager {
 
     /**
