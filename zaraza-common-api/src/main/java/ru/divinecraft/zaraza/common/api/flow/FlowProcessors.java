@@ -16,49 +16,65 @@ package ru.divinecraft.zaraza.common.api.flow;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.experimental.Accessors;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.UtilityClass;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.Flow;
+import java.util.concurrent.Flow.Processor;
+import java.util.concurrent.Flow.Subscriber;
+import java.util.concurrent.Flow.Subscription;
 
 /**
- * Utilities related to {@link Flow.Processor}.
+ * Utilities related to {@link Processor}.
  */
 @UtilityClass
 public class FlowProcessors {
 
     /**
-     * Creates a new thread-unsafe {@link Flow.Processor processor}.
+     * Creates a new thread-unsafe {@link Processor processor}.
      *
      * @param <T> type of processed values
      *
-     * @return created {@link Flow.Processor processor}
+     * @return created {@link Processor processor}
      */
-    public static <T> Flow.@NotNull Processor<T, T> createProcessor() {
+    public static <T> @NotNull Processor<T, T> createProcessor() {
         return new ThreadUnsafeProcessor<>(new HashSet<>());
     }
 
     /**
-     * Simple {@link Flow.Processor processor} for which no concurrency guarantees are given.
+     * Creates a new thread-unsafe {@link Processor processor}.
+     *
+     * @param <T> type of processed values
+     *
+     * @return created {@link Processor processor}
+     */
+    public static <T> @NotNull MemoizingFlowProcessor<T, T> createMemoizingProcessor() {
+        return new MemoizingThreadUnsafeProcessor<>(new HashSet<>());
+    }
+
+    /**
+     * Simple {@link Processor processor} for which no concurrency guarantees are given.
      *
      * @param <T> type of processed values
      */
     @AllArgsConstructor(access = AccessLevel.PRIVATE)
     @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-    private static final class ThreadUnsafeProcessor<T> implements Flow.Processor<T, T> {
+    private static class ThreadUnsafeProcessor<T> implements Processor<T, T> {
 
         /**
          * All subscribers of this processor
          */
-        @NotNull Set<Flow.@NotNull Subscriber<? super T>> subscribers;
+        @NotNull Set<@NotNull Subscriber<? super T>> subscribers;
 
         @Override
-        public void subscribe(final Flow.Subscriber<? super T> subscriber) {
-            if (subscribers.add(subscriber)) subscriber.onSubscribe(new Flow.Subscription() {
+        public void subscribe(final Subscriber<? super T> subscriber) {
+            if (subscribers.add(subscriber)) subscriber.onSubscribe(new Subscription() {
                 @Override
                 public void request(final long amount) {} // no-op
 
@@ -70,7 +86,7 @@ public class FlowProcessors {
         }
 
         @Override
-        public void onSubscribe(final Flow.Subscription subscription) {} // no-op
+        public void onSubscribe(final Subscription subscription) {} // no-op
 
         @Override
         public void onNext(final T item) {
@@ -85,6 +101,31 @@ public class FlowProcessors {
         @Override
         public void onComplete() {
             for (val subscriber : subscribers) subscriber.onComplete();
+        }
+    }
+
+    /**
+     * {@link MemoizingFlowProcessor Memoizing} {@link ThreadUnsafeProcessor}.
+     *
+     * @param <T> type of processed values
+     */
+    @Accessors(fluent = true)
+    @FieldDefaults(level = AccessLevel.PRIVATE)
+    private static final class MemoizingThreadUnsafeProcessor<T>
+            extends ThreadUnsafeProcessor<T> implements MemoizingFlowProcessor<T, T> {
+
+        /**
+         * Last value passed to {@link #onNext(Object)}.
+         */
+        @Getter @Nullable T lastValue; // default-initialized to null
+
+        private MemoizingThreadUnsafeProcessor(final @NotNull Set<@NotNull Subscriber<? super T>> subscribers) {
+            super(subscribers);
+        }
+
+        @Override
+        public void onNext(final T item) {
+            super.onNext(lastValue = item);
         }
     }
 }
