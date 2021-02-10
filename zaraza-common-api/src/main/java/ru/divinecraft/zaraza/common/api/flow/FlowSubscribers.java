@@ -45,7 +45,7 @@ public class FlowSubscribers {
      * @throws NullPointerException if {@code nextHandler} is {@code null}
      * @throws NullPointerException if {@code errorHandler} is {@code null}
      */
-    static <T> @NotNull Subscriber<T> createSubscriber(
+    public <T> @NotNull Subscriber<T> createSubscriber(
             final @NonNull Consumer<? super T> nextHandler,
             final @NonNull Consumer<@NotNull Throwable> errorHandler
     ) {
@@ -61,7 +61,7 @@ public class FlowSubscribers {
      *
      * @throws NullPointerException if {@code nextHandler} is {@code null}
      */
-    static <@NotNull T> @NotNull Subscriber<T> createSubscriber(
+    public <@NotNull T> @NotNull Subscriber<T> createSubscriber(
             final Consumer<@NotNull T> nextHandler
     ) {
         return createSubscriber(nextHandler, error -> {
@@ -80,7 +80,7 @@ public class FlowSubscribers {
      * @throws NullPointerException if {@code nextHandler} is {@code null}
      * @throws NullPointerException if {@code errorHandler} is {@code null}
      */
-    static <T> @NotNull MemoizingFlowSubscriber<T> createMemoizingSubscriber(
+    public <T> @NotNull MemoizingFlowSubscriber<T> createMemoizingSubscriber(
             final @NonNull Consumer<? super T> nextHandler,
             final @NonNull Consumer<@NotNull Throwable> errorHandler
     ) {
@@ -96,7 +96,7 @@ public class FlowSubscribers {
      *
      * @throws NullPointerException if {@code nextHandler} is {@code null}
      */
-    static <@NotNull T> @NotNull MemoizingFlowSubscriber<T> createMemoizingSubscriber(
+    public <@NotNull T> @NotNull MemoizingFlowSubscriber<T> createMemoizingSubscriber(
             final Consumer<? super @NotNull T> nextHandler
     ) {
         return createMemoizingSubscriber(nextHandler, error -> {
@@ -110,14 +110,14 @@ public class FlowSubscribers {
      * @param <T> type of value whose updates will be listened
      * @return created memoizing subscriber
      */
-    static <@NotNull T> @NotNull MemoizingFlowSubscriber<T> createMemoizingSubscriber() {
+    public <@NotNull T> @NotNull MemoizingFlowSubscriber<T> createMemoizingSubscriber() {
         return createMemoizingSubscriber(newValue -> {});
     }
 
     //<editor-fold desc="Inner implementations" defaultstate="collapsed">
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-    private class DelegatingSubscriber<T> implements Subscriber<T> {
+    private static class DelegatingSubscriber<T> implements Subscriber<T> {
 
         @NotNull Consumer<? super T> nextHandler;
         @NotNull Consumer<@NotNull Throwable> errorHandler;
@@ -141,7 +141,7 @@ public class FlowSubscribers {
 
     @Accessors(fluent = true)
     @FieldDefaults(level = AccessLevel.PRIVATE)
-    private final class ThreadUnsafeMemoizingDelegatingSubscriber<T>
+    private static final class ThreadUnsafeMemoizingDelegatingSubscriber<T>
             extends DelegatingSubscriber<T> implements MemoizingFlowSubscriber<T> {
 
         /**

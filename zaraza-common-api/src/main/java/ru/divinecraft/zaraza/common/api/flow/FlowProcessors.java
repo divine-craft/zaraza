@@ -43,7 +43,7 @@ public class FlowProcessors {
      *
      * @return created {@link Processor processor}
      */
-    public static <T> @NotNull Processor<T, T> createProcessor() {
+    public <T> @NotNull Processor<T, T> createProcessor() {
         return new ThreadUnsafeProcessor<>(new HashSet<>());
     }
 
@@ -54,7 +54,7 @@ public class FlowProcessors {
      *
      * @return created {@link Processor processor}
      */
-    public static <T> @NotNull MemoizingFlowProcessor<T, T> createMemoizingProcessor() {
+    public <T> @NotNull MemoizingFlowProcessor<T, T> createMemoizingProcessor() {
         return new MemoizingThreadUnsafeProcessor<>(new HashSet<>());
     }
 
