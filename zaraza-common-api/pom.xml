@@ -39,7 +39,6 @@
             <groupId>ru.progrm-jarvis.minecraft</groupId>
             <artifactId>packet-wrapper</artifactId>
         </dependency>
-
         <!-- Libraries -->
         <dependency>
             <groupId>ru.progrm-jarvis</groupId>
