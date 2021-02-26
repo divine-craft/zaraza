@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
+<?xml version="1.0" encoding="UTF-8"?><!--
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
   ~ You may obtain a copy of the License at
@@ -37,6 +36,8 @@
         <github.url>https://github.com/${github.coordinate}</github.url>
         <!-- Dependency versions -->
         <version.zaraza>1.0.0-SNAPSHOT</version.zaraza>
+        <zaraza.rootPackage>ru.divinecraft.zaraza</zaraza.rootPackage>
+        <zaraza.libPackage>${zaraza.rootPackage}.lib</zaraza.libPackage>
         <version.padla>1.0.0-SNAPSHOT</version.padla>
         <version.minecraft-utils>1.0.0-SNAPSHOT</version.minecraft-utils>
     </properties>
@@ -122,6 +123,27 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>3.2.4</version>
+                    <executions>
+                        <execution>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>shade</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <relocations>
+                            <relocation>
+                                <pattern>it.unimi.dsi.fastutil.</pattern>
+                                <shadedPattern>${zaraza.libPackage}.fastutil.</shadedPattern>
+                            </relocation>
+                        </relocations>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>3.2.0</version>
                     <configuration>
@@ -183,6 +205,11 @@
             </dependency>
 
             <!-- Libraries -->
+            <dependency>
+                <groupId>it.unimi.dsi</groupId>
+                <artifactId>fastutil</artifactId>
+                <version>8.5.2</version>
+            </dependency>
             <dependency>
                 <groupId>ru.progrm-jarvis</groupId>
                 <artifactId>java-commons</artifactId>
