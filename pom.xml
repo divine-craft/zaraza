@@ -36,7 +36,9 @@
         <github.coordinate>${github.owner}/${github.repository}</github.coordinate>
         <github.url>https://github.com/${github.coordinate}</github.url>
         <!-- Dependency versions -->
+        <version.zaraza>1.0.0-SNAPSHOT</version.zaraza>
         <version.padla>1.0.0-SNAPSHOT</version.padla>
+        <version.minecraft-utils>1.0.0-SNAPSHOT</version.minecraft-utils>
     </properties>
 
     <name>Zaraza</name>
@@ -161,9 +163,9 @@
         <dependencies>
             <!-- Own modules -->
             <dependency>
-                <groupId>${project.groupId}</groupId>
+                <groupId>ru.divinecraft</groupId>
                 <artifactId>zaraza-common-api</artifactId>
-                <version>${project.version}</version>
+                <version>${version.zaraza}</version>
             </dependency>
 
             <!-- Runtime -->
@@ -179,12 +181,6 @@
                 <version>4.6.0</version>
                 <scope>provided</scope>
             </dependency>
-            <dependency>
-                <groupId>io.sentry</groupId>
-                <artifactId>sentry</artifactId>
-                <version>4.2.0</version>
-                <scope>provided</scope>
-            </dependency>
 
             <!-- Libraries -->
             <dependency>
@@ -194,13 +190,33 @@
             </dependency>
             <dependency>
                 <groupId>ru.progrm-jarvis</groupId>
+                <artifactId>reflector</artifactId>
+                <version>${version.padla}</version>
+            </dependency>
+            <dependency>
+                <groupId>ru.progrm-jarvis</groupId>
                 <artifactId>ultimate-messenger</artifactId>
                 <version>${version.padla}</version>
             </dependency>
             <dependency>
                 <groupId>ru.progrm-jarvis.minecraft</groupId>
+                <artifactId>minecraft-commons</artifactId>
+                <version>${version.minecraft-utils}</version>
+            </dependency>
+            <dependency>
+                <groupId>ru.progrm-jarvis.minecraft</groupId>
+                <artifactId>fake-entity-lib</artifactId>
+                <version>${version.minecraft-utils}</version>
+            </dependency>
+            <dependency>
+                <groupId>ru.progrm-jarvis.minecraft</groupId>
                 <artifactId>packet-wrapper</artifactId>
                 <version>1.16.4-SNAPSHOT</version>
+            </dependency>
+            <dependency>
+                <groupId>io.sentry</groupId>
+                <artifactId>sentry</artifactId>
+                <version>4.2.0</version>
             </dependency>
 
             <!-- Code-generation -->

@@ -33,20 +33,35 @@
             <groupId>com.comphenix.protocol</groupId>
             <artifactId>ProtocolLib</artifactId>
         </dependency>
-        <dependency>
-            <groupId>io.sentry</groupId>
-            <artifactId>sentry</artifactId>
-        </dependency>
 
         <!-- Libraries -->
+        <dependency>
+            <groupId>ru.progrm-jarvis</groupId>
+            <artifactId>java-commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ru.progrm-jarvis</groupId>
+            <artifactId>reflector</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ru.progrm-jarvis</groupId>
+            <artifactId>ultimate-messenger</artifactId>
+        </dependency>
         <dependency>
             <groupId>ru.progrm-jarvis.minecraft</groupId>
             <artifactId>packet-wrapper</artifactId>
         </dependency>
-        <!-- Libraries -->
         <dependency>
-            <groupId>ru.progrm-jarvis</groupId>
-            <artifactId>ultimate-messenger</artifactId>
+            <groupId>ru.progrm-jarvis.minecraft</groupId>
+            <artifactId>minecraft-commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ru.progrm-jarvis.minecraft</groupId>
+            <artifactId>fake-entity-lib</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.sentry</groupId>
+            <artifactId>sentry</artifactId>
         </dependency>
 
         <!-- Code-generation -->
