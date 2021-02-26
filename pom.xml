@@ -38,6 +38,7 @@
         <version.zaraza>1.0.0-SNAPSHOT</version.zaraza>
         <zaraza.rootPackage>ru.divinecraft.zaraza</zaraza.rootPackage>
         <zaraza.libPackage>${zaraza.rootPackage}.lib</zaraza.libPackage>
+        <version.padla>1.0.0-SNAPSHOT</version.padla>
         <version.minecraft-utils>1.0.0-SNAPSHOT</version.minecraft-utils>
     </properties>
 
