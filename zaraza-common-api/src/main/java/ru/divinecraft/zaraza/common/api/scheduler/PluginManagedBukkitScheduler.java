@@ -62,83 +62,83 @@ public final class PluginManagedBukkitScheduler implements ManagedBukkitSchedule
     }
 
     @Override
-    public int scheduleSyncDelayedTask(@NonNull final Runnable task, final long delay) {
+    public int scheduleSyncDelayedTask(final @NonNull Runnable task, final long delay) {
         return scheduler.scheduleSyncDelayedTask(owner, task, delay);
     }
 
     @Override
-    public int scheduleSyncDelayedTask(@NonNull final Runnable task) {
+    public int scheduleSyncDelayedTask(final @NonNull Runnable task) {
         return scheduler.scheduleSyncDelayedTask(owner, task);
     }
 
     @Override
-    public int scheduleSyncRepeatingTask(@NonNull final Runnable task, final long delay, final long period) {
+    public int scheduleSyncRepeatingTask(final @NonNull Runnable task, final long delay, final long period) {
         return scheduler.scheduleSyncRepeatingTask(owner, task, delay, period);
     }
 
     @Override
-    public @NotNull <T> Future<T> callSyncMethod(@NonNull final Callable<T> task) {
+    public @NotNull <T> Future<T> callSyncMethod(final @NonNull Callable<T> task) {
         return scheduler.callSyncMethod(owner, task);
     }
 
     @Override
-    public @NotNull BukkitTask runTask(@NonNull final Runnable task) {
+    public @NotNull BukkitTask runTask(final @NonNull Runnable task) {
         return scheduler.runTask(owner, task);
     }
 
     @Override
-    public void runTask(@NonNull final Consumer<@NotNull BukkitTask> task) {
+    public void runTask(final @NonNull Consumer<@NotNull BukkitTask> task) {
         scheduler.runTask(owner, task);
     }
 
     @Override
-    public @NotNull BukkitTask runTaskAsynchronously(@NonNull final Runnable task) {
+    public @NotNull BukkitTask runTaskAsynchronously(final @NonNull Runnable task) {
         return scheduler.runTaskAsynchronously(owner, task);
     }
 
     @Override
-    public void runTaskAsynchronously(@NonNull final Consumer<@NotNull BukkitTask> task) {
+    public void runTaskAsynchronously(final @NonNull Consumer<@NotNull BukkitTask> task) {
         scheduler.runTaskAsynchronously(owner, task);
     }
 
     @Override
-    public @NotNull BukkitTask runTaskLater(@NonNull final Runnable task, final long delay) {
+    public @NotNull BukkitTask runTaskLater(final @NonNull Runnable task, final long delay) {
         return scheduler.runTaskLater(owner, task, delay);
     }
 
     @Override
-    public void runTaskLater(@NonNull final Consumer<@NotNull BukkitTask> task, final long delay) {
+    public void runTaskLater(final @NonNull Consumer<@NotNull BukkitTask> task, final long delay) {
         scheduler.runTaskLater(owner, task, delay);
     }
 
     @Override
-    public @NotNull BukkitTask runTaskLaterAsynchronously(@NonNull final Runnable task, final long delay) {
+    public @NotNull BukkitTask runTaskLaterAsynchronously(final @NonNull Runnable task, final long delay) {
         return scheduler.runTaskLaterAsynchronously(owner, task, delay);
     }
 
     @Override
-    public void runTaskLaterAsynchronously(@NonNull final Consumer<@NotNull BukkitTask> task, final long delay) {
+    public void runTaskLaterAsynchronously(final @NonNull Consumer<@NotNull BukkitTask> task, final long delay) {
         scheduler.runTaskLaterAsynchronously(owner, task, delay);
     }
 
     @Override
-    public @NotNull BukkitTask runTaskTimer(@NonNull final Runnable task, final long delay, final long period) {
+    public @NotNull BukkitTask runTaskTimer(final @NonNull Runnable task, final long delay, final long period) {
         return scheduler.runTaskTimer(owner, task, delay, period);
     }
 
     @Override
-    public void runTaskTimer(@NonNull final Consumer<@NotNull BukkitTask> task, final long delay, final long period) {
+    public void runTaskTimer(final @NonNull Consumer<@NotNull BukkitTask> task, final long delay, final long period) {
         scheduler.runTaskTimer(owner, task, delay, period);
     }
 
     @Override
-    public @NotNull BukkitTask runTaskTimerAsynchronously(@NonNull final Runnable task, final long delay,
+    public @NotNull BukkitTask runTaskTimerAsynchronously(final @NonNull Runnable task, final long delay,
                                                           final long period) {
         return scheduler.runTaskTimerAsynchronously(owner, task, delay, period);
     }
 
     @Override
-    public void runTaskTimerAsynchronously(@NonNull final Consumer<BukkitTask> task, final long delay,
+    public void runTaskTimerAsynchronously(final @NonNull Consumer<BukkitTask> task, final long delay,
                                            final long period) {
         scheduler.runTaskTimerAsynchronously(owner, task, delay, period);
     }
