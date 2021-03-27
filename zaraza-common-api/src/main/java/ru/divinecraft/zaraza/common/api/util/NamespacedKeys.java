@@ -4,6 +4,7 @@ import lombok.NonNull;
 import lombok.experimental.UtilityClass;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.Plugin;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -39,8 +40,7 @@ public class NamespacedKeys {
      * @throws IllegalArgumentException if namespaced key cannot be created from given namespace and key
      */
     public @NotNull NamespacedKey of(final @NotNull String namespace, final @NotNull String key) {
-        //noinspection deprecation
-        return new NamespacedKey(namespace, key);
+        return newNamespacedKey(namespace, key);
     }
 
     /**
@@ -75,8 +75,7 @@ public class NamespacedKeys {
                 "Namespaced key should consist of colon-delimited namespace and key"
         );
 
-        //noinspection deprecation
-        return new NamespacedKey(
+        return newNamespacedKey(
                 namespacedKey.substring(0, delimiterIndex),
                 namespacedKey.substring(delimiterIndex + 1)
         );
@@ -105,8 +104,7 @@ public class NamespacedKeys {
         final String key;
         if (!isValidKey(key = namespacedKey.substring(delimiterIndex + 1))) return Optional.empty();
 
-        //noinspection deprecation
-        return Optional.of(new NamespacedKey(namespace, key));
+        return Optional.of(newNamespacedKey(namespace, key));
     }
 
     /**
@@ -162,5 +160,21 @@ public class NamespacedKeys {
         }
 
         return true;
+    }
+
+    /**
+     * Creates a new namespaced key from namespace and key
+     * by invoking a deprecated constructor of {@link NamespacedKey}.
+     *
+     * @param namespace namespace of the created namespaced key
+     * @param key key of the created namespaced key
+     * @return created namespaced key
+     *
+     * @throws IllegalArgumentException if namespaced key cannot be created from given namespace and key
+     */
+    @Contract("_, _ -> new")
+    @SuppressWarnings("deprecation")
+    private static @NotNull NamespacedKey newNamespacedKey(final @NotNull String namespace, final @NotNull String key) {
+        return new NamespacedKey(namespace, key);
     }
 }
