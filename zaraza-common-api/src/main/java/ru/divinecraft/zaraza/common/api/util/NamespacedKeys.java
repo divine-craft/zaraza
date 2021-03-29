@@ -88,15 +88,10 @@ public class NamespacedKeys {
      * @return parsed namespaced key
      */
     public @NotNull Optional<NamespacedKey> tryParse(final @NonNull String namespacedKey) {
-        if (namespacedKey.length() > MAX_NAMESPACED_KEY_LENGTH) throw new IllegalArgumentException(
-                "Namespaced key's string representation cannot be longer than "
-                        + MAX_NAMESPACED_KEY_LENGTH + " characters"
-        );
+        if (namespacedKey.length() > MAX_NAMESPACED_KEY_LENGTH) return Optional.empty();
 
         final int delimiterIndex;
-        if ((delimiterIndex = namespacedKey.indexOf(':')) == -1) throw new IllegalArgumentException(
-                "Namespaced key should consist of colon-delimited namespace and key"
-        );
+        if ((delimiterIndex = namespacedKey.indexOf(':')) == -1) return Optional.empty();
 
         final String namespace;
         if (!isValidKey(namespace = namespacedKey.substring(0, delimiterIndex))) return Optional.empty();
