@@ -52,7 +52,7 @@ public class BukkitGsonTypeAdapterFactories {
      *
      * @return {@link TypeAdapterFactory} for {@link NamespacedKey}
      */
-    public static @NotNull TypeAdapterFactory namespacedKeyTypeAdapterFactory() {
+    public @NotNull TypeAdapterFactory namespacedKeyTypeAdapterFactory() {
         return SingleTypeTypeAdapterFactory.create(NamespacedKey.class, new TypeAdapter<>() {
             @Override
             public void write(final @NotNull JsonWriter out, final @Nullable NamespacedKey value)
