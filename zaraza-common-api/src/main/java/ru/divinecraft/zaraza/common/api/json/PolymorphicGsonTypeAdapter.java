@@ -163,7 +163,20 @@ public final class PolymorphicGsonTypeAdapter<B> implements TypeAdapterFactory {
             return adaptersByName.get(name);
         }
 
+        /**
+         * Gets the generic class of the provided value.
+         *
+         * @param value value whose type should be resolved
+         * @param <T> expected generic type of the value
+         * @return generic class of the value
+         */
+        @SuppressWarnings("unchecked")
+        private static @NotNull <T> Class<T> genericClassOf(final @NotNull T value) {
+            return (Class<T>) value.getClass();
+        }
+
         @Override
+        @SuppressWarnings("unchekced")
         public void write(final @NotNull JsonWriter out, final @Nullable B value) throws IOException {
             if (value == null) {
                 out.nullValue();
@@ -174,8 +187,7 @@ public final class PolymorphicGsonTypeAdapter<B> implements TypeAdapterFactory {
             {
                 final NamedTypeAdapter<B> namedTypeAdapter;
                 final Class<B> type; // note: generic bound is unavailable here
-                //noinspection unchecked: getClass() on generics requires explicit cast
-                if ((namedTypeAdapter = findTypeAdapter(type = (Class<B>) value.getClass()))
+                if ((namedTypeAdapter = findTypeAdapter(type = genericClassOf(value)))
                         == null) throw new IllegalArgumentException("Unknown value of type \"" + type + '"');
 
                 {

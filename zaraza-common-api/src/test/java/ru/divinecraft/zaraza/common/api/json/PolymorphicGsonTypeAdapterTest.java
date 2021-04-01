@@ -16,6 +16,7 @@ package ru.divinecraft.zaraza.common.api.json;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
@@ -94,7 +95,7 @@ class PolymorphicGsonTypeAdapterTest {
 
     @Test
     void testDoesNotProduceFalseMatches() {
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(JsonParseException.class,
                 () -> gson.fromJson("{\n"
                         // language=JSON
                         + "  \"type\": \"pong\",\n"
@@ -103,7 +104,7 @@ class PolymorphicGsonTypeAdapterTest {
                         + "}", Foo.class
                 )
         );
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(JsonParseException.class,
                 () -> gson.fromJson("{\n"
                         // language=JSON
                         + "  \"type\": \"bonk\",\n"
@@ -112,7 +113,7 @@ class PolymorphicGsonTypeAdapterTest {
                         + "}", Foo.class
                 )
         );
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(JsonParseException.class,
                 () -> gson.fromJson("{\n"
                         // language=JSON
                         + "  \"type\": \"yup\",\n"
@@ -122,7 +123,8 @@ class PolymorphicGsonTypeAdapterTest {
         );
     }
 
-    interface Foo<T> {
+    @FunctionalInterface
+    private interface Foo<T> {
         @SuppressWarnings("unused" /* just utilize the generic */)
         T genericValue();
     }
@@ -217,6 +219,7 @@ class PolymorphicGsonTypeAdapterTest {
         }
     }
 
+    @FunctionalInterface
     private interface Qux<T extends Number> extends Foo<@Nullable T> {
 
         @Nullable T value();
