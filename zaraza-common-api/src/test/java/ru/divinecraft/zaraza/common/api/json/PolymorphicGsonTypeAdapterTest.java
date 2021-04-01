@@ -14,10 +14,8 @@
 
 package ru.divinecraft.zaraza.common.api.json;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParseException;
-import com.google.gson.TypeAdapter;
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import lombok.Value;
@@ -40,10 +38,12 @@ class PolymorphicGsonTypeAdapterTest {
     @BeforeEach
     void setUp() {
         gson = new GsonBuilder()
+                .registerTypeAdapterFactory(Lol.typeAdapterFactory())
                 .registerTypeAdapterFactory(PolymorphicGsonTypeAdapter.builder(Foo.class, "type")
                         .subtype("bar", Bar.class, Bar.typeAdapter())
                         .subtype("baz", Baz.class, Baz.typeAdapter())
                         .subtype("qux", Qux.class, Qux.typeAdapter())
+                        .subtype("lol", Lol.class)
                         .build()
                 )
                 .create();
@@ -94,7 +94,21 @@ class PolymorphicGsonTypeAdapterTest {
     }
 
     @Test
-    void testDoesNotProduceFalseMatches() {
+    void testWorksExplicitWithTypeAdapterFactory() {
+        assertEquals(
+                new Lol(1.337),
+                gson.fromJson("{\n"
+                                // language=JSON
+                                + "  \"type\": \"lol\",\n"
+                                + "  \"value\": 1.337\n"
+                                + "}",
+                        Foo.class
+                )
+        );
+    }
+
+    @Test
+    void testDoesNotMatchUnknownNames() {
         assertThrows(JsonParseException.class,
                 () -> gson.fromJson("{\n"
                         // language=JSON
@@ -118,6 +132,14 @@ class PolymorphicGsonTypeAdapterTest {
                         // language=JSON
                         + "  \"type\": \"yup\",\n"
                         + "  \"value\": 8800\n"
+                        + "}", Foo.class
+                )
+        );
+        assertThrows(JsonParseException.class,
+                () -> gson.fromJson("{\n"
+                        // language=JSON
+                        + "  \"type\": \"smth\",\n"
+                        + "  \"value\": 1.337\n"
                         + "}", Foo.class
                 )
         );
@@ -166,6 +188,7 @@ class PolymorphicGsonTypeAdapterTest {
                             break;
                         }
                     }
+
                     in.endObject();
 
                     return new Bar(commonField, barUniqueField);
@@ -211,6 +234,7 @@ class PolymorphicGsonTypeAdapterTest {
                             break;
                         }
                     }
+
                     in.endObject();
 
                     return new Baz<>(commonField, bazUniqueField);
@@ -245,6 +269,7 @@ class PolymorphicGsonTypeAdapterTest {
 
                     Number value = null;
                     while (in.hasNext()) if ("value" .equals(in.nextName())) value = in.nextInt();
+
                     in.endObject();
 
                     return ImmutableQux.of(value);
@@ -257,5 +282,45 @@ class PolymorphicGsonTypeAdapterTest {
     @Value(staticConstructor = "of")
     private static class ImmutableQux<T extends Number> implements Qux<T> {
         @Nullable T value;
+    }
+
+    @Value
+    private static class Lol implements Foo<@Nullable Double> {
+
+        @Nullable Double value;
+
+        @Override
+        public Double genericValue() {
+            return value;
+        }
+
+        public static @NotNull TypeAdapterFactory typeAdapterFactory() {
+            return new TypeAdapterFactory() {
+                @Override
+                @SuppressWarnings("unchecked")
+                public <T> TypeAdapter<T> create(final Gson gson, final TypeToken<T> type) {
+                    return Lol.class.isAssignableFrom(type.getRawType()) ? (TypeAdapter<T>) new TypeAdapter<Lol>() {
+                        @Override
+                        public void write(final JsonWriter out, final Lol value) throws IOException {
+                            out
+                                    .beginObject()
+                                    .name("value").value(value.value)
+                                    .endObject();
+                        }
+
+                        @Override
+                        public Lol read(final JsonReader in) throws IOException {
+                            in.beginObject();
+
+                            Double value = null;
+                            while (in.hasNext()) if ("value" .equals(in.nextName())) value = in.nextDouble();
+
+                            in.endObject();
+                            return new Lol(value);
+                        }
+                    } : null;
+                }
+            };
+        }
     }
 }

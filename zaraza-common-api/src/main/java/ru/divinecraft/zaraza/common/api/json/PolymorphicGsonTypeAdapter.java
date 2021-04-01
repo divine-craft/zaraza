@@ -52,9 +52,19 @@ public final class PolymorphicGsonTypeAdapter<B> implements TypeAdapterFactory {
     @NotNull Class<B> baseType;
 
     /**
-     * Internal type adapter provided by the factory when needed.
+     * Name of the field used to store type name
      */
-    @NotNull TypeAdapter<B> typeAdapter;
+    @NotNull String discriminantFieldName;
+
+    /**
+     * Named adapters by their names
+     */
+    @NotNull @Unmodifiable Map<@NotNull String, @NotNull NamedTypeAdapter<? extends B>> adaptersByName;
+
+    /**
+     * Named adapters by their types
+     */
+    @NotNull @Unmodifiable Map<@NotNull Class<? extends B>, @NotNull NamedTypeAdapter<? extends B>> adaptersByType;
 
     /**
      * Creates a new builder used for creation of polymorphic type adapter factory.
@@ -73,9 +83,10 @@ public final class PolymorphicGsonTypeAdapter<B> implements TypeAdapterFactory {
     }
 
     @Override
-    @SuppressWarnings("unchecked") // Type-checking is done via `type` partameter
+    @SuppressWarnings("unchecked") // Type-checking is done via `type` parameter
     public <T> @Nullable TypeAdapter<T> create(final @NotNull Gson gson, final @NotNull TypeToken<T> type) {
-        return baseType.isAssignableFrom(type.getRawType()) ? (TypeAdapter<T>) typeAdapter : null;
+        return baseType.isAssignableFrom(type.getRawType())
+                ? (TypeAdapter<T>) new PolymorphicTypeAdapter<>(this, gson) : null;
     }
 
     /**
@@ -103,6 +114,21 @@ public final class PolymorphicGsonTypeAdapter<B> implements TypeAdapterFactory {
                                                   @NonNull TypeAdapter<? extends T> adapter);
 
         /**
+         * Adds a new supported subtype to the created polymorphic type adapter.
+         * This one will be serialized using other available type adapter.
+         *
+         * @param name name by which the subtype should be identified
+         * @param type type being added
+         * @param <T> type being added
+         * @return this builder
+         *
+         * @throws NullPointerException if {@code name} is {@code null}
+         * @throws NullPointerException if {@code type} is {@code null}
+         */
+        @Contract("_, _ -> this")
+        <T extends B> @NotNull Builder<B> subtype(@NonNull String name, @NonNull Class<T> type);
+
+        /**
          * Creates a new polymorphic type adapter from this builder.
          *
          * @return created polymorphic type adapter
@@ -110,7 +136,19 @@ public final class PolymorphicGsonTypeAdapter<B> implements TypeAdapterFactory {
         @NotNull TypeAdapterFactory build();
     }
 
-    //<editor-fold desc="PolymorhicTypeAdapter implementation" defaultstate="collapsed">
+    //<editor-fold desc="PolymorphicTypeAdapter implementation" defaultstate="collapsed">
+
+    /**
+     * Gets the generic class of the provided value.
+     *
+     * @param value value whose type should be resolved
+     * @param <T> expected generic type of the value
+     * @return generic class of the value
+     */
+    @SuppressWarnings("unchecked")
+    private static @NotNull <T> Class<T> genericClassOf(final @NotNull T value) {
+        return (Class<T>) value.getClass();
+    }
 
     /**
      * Type adapter capable of serializing and deserializing multiple different types
@@ -120,22 +158,17 @@ public final class PolymorphicGsonTypeAdapter<B> implements TypeAdapterFactory {
      */
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-    private static final class PolymorhicTypeAdapter<B> extends TypeAdapter<B> {
+    private final class PolymorphicTypeAdapter<B> extends TypeAdapter<B> {
 
         /**
-         * Name of the field used to store type name
+         * Factory which has created this type adapter
          */
-        @NotNull String discriminantFieldName;
+        @NotNull TypeAdapterFactory owningFactory;
 
         /**
-         * Adapters by their names
+         * GSON instance used for default serialization and deserialization.
          */
-        @NotNull @Unmodifiable Map<@NotNull String, @NotNull TypeAdapter<? extends B>> adaptersByName;
-
-        /**
-         * Names adapters by their types
-         */
-        @NotNull @Unmodifiable Map<@NotNull Class<? extends B>, @NotNull NamedTypeAdapter<? extends B>> adaptersByType;
+        @NotNull Gson gson;
 
         /**
          * Finds the named type adapter by the given type.
@@ -146,7 +179,8 @@ public final class PolymorphicGsonTypeAdapter<B> implements TypeAdapterFactory {
         @SuppressWarnings("unchecked")
         private @Nullable <T extends B> NamedTypeAdapter<T> findTypeAdapter(final @NotNull Class<T> type) {
             //@formatter:off
-            for (val adapterByType : adaptersByType.entrySet()) if (adapterByType.getKey()
+            // RIP lombok val here:
+            for (final var adapterByType : adaptersByType.entrySet()) if (adapterByType.getKey()
                     .isAssignableFrom(type)) return (NamedTypeAdapter<T>) adapterByType.getValue();
             //@formatter:on
 
@@ -159,20 +193,9 @@ public final class PolymorphicGsonTypeAdapter<B> implements TypeAdapterFactory {
          * @param name name by which to find the adapter
          * @return adapter for the given name
          */
-        private @Nullable TypeAdapter<? extends B> findTypeAdapter(final @NotNull String name) {
-            return adaptersByName.get(name);
-        }
-
-        /**
-         * Gets the generic class of the provided value.
-         *
-         * @param value value whose type should be resolved
-         * @param <T> expected generic type of the value
-         * @return generic class of the value
-         */
         @SuppressWarnings("unchecked")
-        private static @NotNull <T> Class<T> genericClassOf(final @NotNull T value) {
-            return (Class<T>) value.getClass();
+        private @Nullable NamedTypeAdapter<? extends B> findTypeAdapter(final @NotNull String name) {
+            return (NamedTypeAdapter<? extends B>) adaptersByName.get(name);
         }
 
         @Override
@@ -192,7 +215,7 @@ public final class PolymorphicGsonTypeAdapter<B> implements TypeAdapterFactory {
 
                 {
                     final JsonElement structureElement;
-                    if (!(structureElement = namedTypeAdapter.typeAdapter().toJsonTree(value))
+                    if (!(structureElement = namedTypeAdapter.typeAdapter(owningFactory, gson).toJsonTree(value))
                             .isJsonObject()) throw new IllegalArgumentException(
                             "TypeAdapter for type " + type + " should create a JSON object"
                     );
@@ -227,7 +250,7 @@ public final class PolymorphicGsonTypeAdapter<B> implements TypeAdapterFactory {
                 structure = structureElement.getAsJsonObject();
             }
 
-            final TypeAdapter<? extends B> adapter;
+            final NamedTypeAdapter<? extends B> adapter;
             {
                 final String thisDiscriminantFieldName;
                 final JsonPrimitive discriminantPrimitive;
@@ -251,7 +274,7 @@ public final class PolymorphicGsonTypeAdapter<B> implements TypeAdapterFactory {
                 structure.remove(thisDiscriminantFieldName);
             }
 
-            return adapter.fromJsonTree(structure);
+            return adapter.typeAdapter(owningFactory, gson).fromJsonTree(structure);
         }
     }
     //</editor-fold>
@@ -278,20 +301,30 @@ public final class PolymorphicGsonTypeAdapter<B> implements TypeAdapterFactory {
         @NotNull String discriminantFieldName;
 
         /**
-         * Adapters by their names
+         * Named adapters by their names
          */
-        @NotNull Map<@NotNull String, @NotNull TypeAdapter<? extends B>> adaptersByName;
+        @NotNull Map<@NotNull String, @NotNull NamedTypeAdapter<? extends B>> adaptersByName;
 
         /**
-         * Names adapters by their types
+         * Named adapters by their types
          */
         @NotNull Map<@NotNull Class<? extends B>, @NotNull NamedTypeAdapter<? extends B>> adaptersByType;
 
         @Override
         public @NotNull <T extends B> Builder<B> subtype(final @NonNull String name, final @NonNull Class<T> type,
                                                          final @NonNull TypeAdapter<? extends T> adapter) {
-            adaptersByName.put(name, adapter);
-            adaptersByType.put(type, new ImmutableNamedTypeAdapter<>(name, adapter));
+            final NamedTypeAdapter<? extends B> namedAdapter;
+            adaptersByName.put(name, namedAdapter = new NamedTypeAdapterWrapper<>(name, adapter));
+            adaptersByType.put(type, namedAdapter);
+
+            return this;
+        }
+
+        @Override
+        public @NotNull <T extends B> Builder<B> subtype(final @NonNull String name, final @NonNull Class<T> type) {
+            final NamedTypeAdapter<? extends B> namedAdapter;
+            adaptersByName.put(name, namedAdapter = new GsonBackingNamedTypeAdapter<>(name, type));
+            adaptersByType.put(type, namedAdapter);
 
             return this;
         }
@@ -299,8 +332,7 @@ public final class PolymorphicGsonTypeAdapter<B> implements TypeAdapterFactory {
         @Override
         public @NotNull TypeAdapterFactory build() {
             return new PolymorphicGsonTypeAdapter<>(
-                    baseType,
-                    new PolymorhicTypeAdapter<>(discriminantFieldName, adaptersByName, adaptersByType)
+                    baseType, discriminantFieldName, adaptersByName, adaptersByType
             );
         }
     }
@@ -325,20 +357,23 @@ public final class PolymorphicGsonTypeAdapter<B> implements TypeAdapterFactory {
         /**
          * Gets the wrapped type adapter.
          *
+         * @param currentFactory factory invoking this method
+         * @param gson GSON instance to be used by the created adapter if needed
          * @return wrapped type adapter
          */
-        @NotNull TypeAdapter<T> typeAdapter();
+        @NotNull TypeAdapter<T> typeAdapter(@NotNull TypeAdapterFactory currentFactory,
+                                            @NotNull Gson gson);
     }
 
     /**
-     * Simple immutable implementation of {@link NamedTypeAdapter}.
+     * {@link NamedTypeAdapter} wrapper around regular {@link TypeAdapter}.
      *
      * @param <T> type of the type-adapter's value
      */
     @Value
     @Accessors(fluent = true)
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-    private static class ImmutableNamedTypeAdapter<T> implements NamedTypeAdapter<T> {
+    private static class NamedTypeAdapterWrapper<T> implements NamedTypeAdapter<T> {
 
         /**
          * Name of this type adapter
@@ -348,7 +383,38 @@ public final class PolymorphicGsonTypeAdapter<B> implements TypeAdapterFactory {
         /**
          * Wrapped type adapter
          */
+        @Getter(AccessLevel.NONE)
         @NotNull TypeAdapter<T> typeAdapter;
+
+        @Override
+        public @NotNull TypeAdapter<T> typeAdapter(final @NotNull TypeAdapterFactory currentFactory,
+                                                   final @NotNull Gson gson) {
+            return typeAdapter;
+        }
+    }
+
+    /**
+     * {@link NamedTypeAdapter} wrapper around regular {@link TypeAdapter}.
+     *
+     * @param <T> type of the type-adapter's value
+     */
+    @Value
+    @Accessors(fluent = true)
+    @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+    private static class GsonBackingNamedTypeAdapter<T> implements NamedTypeAdapter<T> {
+
+        /**
+         * Name of this type adapter
+         */
+        @NotNull String name;
+
+        @NotNull Class<T> type;
+
+        @Override
+        public @NotNull TypeAdapter<T> typeAdapter(final @NotNull TypeAdapterFactory currentFactory,
+                                                   final @NotNull Gson gson) {
+            return gson.getDelegateAdapter(currentFactory, TypeToken.get(type));
+        }
     }
     //</editor-fold>
 }
