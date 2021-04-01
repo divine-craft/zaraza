@@ -100,6 +100,6 @@ class NamespacedKeysTest {
     @ParameterizedTest
     @MethodSource("invalidNamespaceComponents")
     void tryParse_valid(final String key, final String value) {
-        assertFalse(NamespacedKeys.tryParse(key + ':' + value).isPresent());
+        assertTrue(NamespacedKeys.tryParse(key + ':' + value).isEmpty());
     }
 }
