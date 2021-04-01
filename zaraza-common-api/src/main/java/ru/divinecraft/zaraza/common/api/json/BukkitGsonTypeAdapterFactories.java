@@ -28,6 +28,7 @@
 
 package ru.divinecraft.zaraza.common.api.json;
 
+import com.google.gson.JsonParseException;
 import com.google.gson.TypeAdapter;
 import com.google.gson.TypeAdapterFactory;
 import com.google.gson.stream.JsonReader;
@@ -69,7 +70,7 @@ public class BukkitGsonTypeAdapterFactories {
                 }
 
                 return NamespacedKeys.tryParse(in.nextString())
-                        .orElseThrow(() -> new IOException("Expected valid namespaced key"));
+                        .orElseThrow(() -> new JsonParseException("Expected valid namespaced key"));
             }
         });
     }
