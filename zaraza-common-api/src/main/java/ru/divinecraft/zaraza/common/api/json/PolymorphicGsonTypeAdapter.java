@@ -27,6 +27,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
+import ru.progrm_jarvis.javacommons.object.Pair;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -79,14 +80,14 @@ public final class PolymorphicGsonTypeAdapter<B> implements TypeAdapterFactory {
      */
     public static <B> @NotNull Builder<B> builder(final @NonNull Class<B> baseType,
                                                   final @NonNull String discriminantFieldName) {
-        return new SimpleBuilder<>(baseType, discriminantFieldName, new HashMap<>(), new HashMap<>());
+        return new SimpleBuilder<>(baseType, discriminantFieldName, new HashMap<>());
     }
 
     @Override
     @SuppressWarnings("unchecked") // Type-checking is done via `type` parameter
     public <T> @Nullable TypeAdapter<T> create(final @NotNull Gson gson, final @NotNull TypeToken<T> type) {
         return baseType.isAssignableFrom(type.getRawType())
-                ? (TypeAdapter<T>) new PolymorphicTypeAdapter<>(this, gson) : null;
+                ? (TypeAdapter<T>) new PolymorphicTypeAdapter(this, gson) : null;
     }
 
     /**
@@ -153,12 +154,10 @@ public final class PolymorphicGsonTypeAdapter<B> implements TypeAdapterFactory {
     /**
      * Type adapter capable of serializing and deserializing multiple different types
      * having one common super-type by having a discriminant field in JSON structure.
-     *
-     * @param <B> base type of all serialized types
      */
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-    private final class PolymorphicTypeAdapter<B> extends TypeAdapter<B> {
+    private final class PolymorphicTypeAdapter extends TypeAdapter<B> {
 
         /**
          * Factory which has created this type adapter
@@ -193,9 +192,8 @@ public final class PolymorphicGsonTypeAdapter<B> implements TypeAdapterFactory {
          * @param name name by which to find the adapter
          * @return adapter for the given name
          */
-        @SuppressWarnings("unchecked")
         private @Nullable NamedTypeAdapter<? extends B> findTypeAdapter(final @NotNull String name) {
-            return (NamedTypeAdapter<? extends B>) adaptersByName.get(name);
+            return adaptersByName.get(name);
         }
 
         @Override
@@ -301,39 +299,50 @@ public final class PolymorphicGsonTypeAdapter<B> implements TypeAdapterFactory {
         @NotNull String discriminantFieldName;
 
         /**
-         * Named adapters by their names
+         * Types of types and corresponding named adapters by their names
          */
-        @NotNull Map<@NotNull String, @NotNull NamedTypeAdapter<? extends B>> adaptersByName;
-
-        /**
-         * Named adapters by their types
-         */
-        @NotNull Map<@NotNull Class<? extends B>, @NotNull NamedTypeAdapter<? extends B>> adaptersByType;
+        @NotNull Map<
+                @NotNull String,
+                @NotNull Pair<@NotNull Class<? extends B>, @NotNull NamedTypeAdapter<? extends B>>
+                > adapters;
 
         @Override
         public @NotNull <T extends B> Builder<B> subtype(final @NonNull String name, final @NonNull Class<T> type,
                                                          final @NonNull TypeAdapter<? extends T> adapter) {
-            final NamedTypeAdapter<? extends B> namedAdapter;
-            adaptersByName.put(name, namedAdapter = new NamedTypeAdapterWrapper<>(name, adapter));
-            adaptersByType.put(type, namedAdapter);
+            adapters.put(name, Pair.of(type, new NamedTypeAdapterWrapper<>(name, adapter)));
 
             return this;
         }
 
         @Override
         public @NotNull <T extends B> Builder<B> subtype(final @NonNull String name, final @NonNull Class<T> type) {
-            final NamedTypeAdapter<? extends B> namedAdapter;
-            adaptersByName.put(name, namedAdapter = new GsonBackingNamedTypeAdapter<>(name, type));
-            adaptersByType.put(type, namedAdapter);
+            adapters.put(name, Pair.of(type, new GsonBackingNamedTypeAdapter<>(name, type)));
 
             return this;
         }
 
         @Override
         public @NotNull TypeAdapterFactory build() {
-            return new PolymorphicGsonTypeAdapter<>(
-                    baseType, discriminantFieldName, adaptersByName, adaptersByType
-            );
+            final Map<@NotNull String, @NotNull NamedTypeAdapter<? extends B>> adaptersByName;
+            final Map<@NotNull Class<? extends B>, @NotNull NamedTypeAdapter<? extends B>> adaptersByType;
+            {
+
+                final Map<String, Pair<Class<? extends B>, NamedTypeAdapter<? extends B>>> thisAdapters;
+                final int size;
+                if ((size = (thisAdapters = adapters).size()) == 0) return NoOpGsonTypeAdapterFactory.create();
+
+                adaptersByName = new HashMap<>(size);
+                adaptersByType = new HashMap<>(size);
+
+                for (val entry : thisAdapters.entrySet()) {
+                    final Pair<Class<? extends B>, NamedTypeAdapter<? extends B>> typeAndAdapter;
+                    final NamedTypeAdapter<? extends B> adapter;
+                    adaptersByName.put(entry.getKey(), adapter = (typeAndAdapter = entry.getValue()).getSecond());
+                    adaptersByType.put(typeAndAdapter.getFirst(), adapter);
+                }
+            }
+
+            return new PolymorphicGsonTypeAdapter<>(baseType, discriminantFieldName, adaptersByName, adaptersByType);
         }
     }
     //</editor-fold>
