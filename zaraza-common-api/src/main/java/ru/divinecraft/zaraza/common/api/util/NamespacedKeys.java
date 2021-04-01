@@ -112,10 +112,8 @@ public class NamespacedKeys {
     // `[a-z0-9._-]+`
     public boolean isValidNamespace(final @NotNull CharSequence namespace) {
         final int length;
-        if ((length = namespace.length()) == 0) throw new IllegalArgumentException("Namespace cannot be empty");
-        if (length > MAX_NAMESPACE_LENGTH) throw new IllegalArgumentException(
-                "Namespace cannot be longer than " + MAX_NAMESPACE_LENGTH
-        );
+        if ((length = namespace.length()) == 0) return false;
+        if (length > MAX_NAMESPACE_LENGTH) return false;
 
         for (var i = 0; i < length; i++) {
             final char character;
@@ -139,10 +137,8 @@ public class NamespacedKeys {
     // `[a-z0-9/._-]+`
     public boolean isValidKey(final @NotNull CharSequence key) {
         final int length;
-        if ((length = key.length()) == 0) throw new IllegalArgumentException("Key cannot be empty");
-        if (length > MAX_KEY_LENGTH) throw new IllegalArgumentException(
-                "Namespace cannot be longer than " + MAX_KEY_LENGTH
-        );
+        if ((length = key.length()) == 0) return false;
+        if (length > MAX_KEY_LENGTH) return false;
 
         for (var i = 0; i < length; i++) {
             final char character;
