@@ -15,7 +15,7 @@
 package ru.divinecraft.zaraza.common.api.json;
 
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.JsonParseException;
 import lombok.val;
 import org.bukkit.NamespacedKey;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,7 @@ class BukkitGsonTypeAdapterFactoriesTest {
                 gson.fromJson("\"hello:world\"", NamespacedKey.class)
         );
 
-        assertThrows(JsonSyntaxException.class,
+        assertThrows(JsonParseException.class,
                 () -> gson.fromJson("\"hello:world with spaces\"", NamespacedKey.class)
         );
     }
