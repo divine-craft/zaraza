@@ -15,4 +15,10 @@
 /**
  * DivineCraft's main API for creating mini-games.
  */
+@Value.Style(passAnnotations = {NotNull.class, Unmodifiable.class, UnmodifiableView.class})
 package ru.divinecraft.zaraza.game.api;
+
+import org.immutables.value.Value;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Unmodifiable;
+import org.jetbrains.annotations.UnmodifiableView;
