@@ -22,6 +22,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>zaraza-common-api</module>
+        <module>zaraza-game-api</module>
     </modules>
 
     <properties>
