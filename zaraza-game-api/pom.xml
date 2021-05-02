@@ -35,8 +35,8 @@
 
         <!-- Runtime -->
         <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot-api</artifactId>
+            <groupId>com.destroystokyo.paper</groupId>
+            <artifactId>paper-api</artifactId>
         </dependency>
         <dependency>
             <groupId>com.comphenix.protocol</groupId>
