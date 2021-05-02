@@ -139,8 +139,8 @@ public class PlayerSets {
         }
 
         @Override
-        public <T> @NotNull T @NotNull [] toArray(final @NonNull T[] array) {
-            //noinspection SuspiciousToArrayCall: verified aboce
+        public <T> @NotNull T @NotNull [] toArray(final @NotNull T @NotNull /* verified by method call */ [] array) {
+            //noinspection SuspiciousToArrayCall: contract requirement, will get verified by internal set
             return set.toArray(array);
         }
 
