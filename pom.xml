@@ -22,6 +22,7 @@
     <packaging>pom</packaging>
     <modules>
         <module>zaraza-common-api</module>
+        <module>zaraza-game-api</module>
     </modules>
 
     <properties>
@@ -97,10 +98,10 @@
     </distributionManagement>
 
     <repositories>
-        <!-- spigot-api -->
+        <!-- paper-api -->
         <repository>
-            <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+            <id>papermc-repo</id>
+            <url>https://papermc.io/repo/repository/maven-public/</url>
         </repository>
         <!-- minecraft-utils snapshots -->
         <repository>
@@ -198,8 +199,8 @@
 
             <!-- Runtime -->
             <dependency>
-                <groupId>org.spigotmc</groupId>
-                <artifactId>spigot-api</artifactId>
+                <groupId>com.destroystokyo.paper</groupId>
+                <artifactId>paper-api</artifactId>
                 <version>1.16.5-R0.1-SNAPSHOT</version>
                 <scope>provided</scope>
             </dependency>
@@ -254,9 +255,16 @@
 
             <!-- Code-generation -->
             <dependency>
+                <groupId>org.immutables</groupId>
+                <artifactId>value</artifactId>
+                <version>2.9.0-beta2</version>
+                <scope>provided</scope>
+                <optional>true</optional>
+            </dependency>
+            <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
-                <version>1.18.18</version>
+                <version>1.18.20</version>
                 <scope>provided</scope>
                 <optional>true</optional>
             </dependency>
@@ -280,6 +288,13 @@
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-params</artifactId>
+                <version>${version.junit}</version>
+                <scope>test</scope>
+            </dependency>
+            <!-- This one is required to run correctly as some dependencies bring legacy Junit with them -->
+            <dependency>
+                <groupId>org.junit.vintage</groupId>
+                <artifactId>junit-vintage-engine</artifactId>
                 <version>${version.junit}</version>
                 <scope>test</scope>
             </dependency>

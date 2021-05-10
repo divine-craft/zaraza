@@ -21,9 +21,18 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>zaraza-common-api</artifactId>
+    <artifactId>zaraza-game-api</artifactId>
+
+    <name>ZarazaGame</name>
+    <description>DivineCraft's main API for creating mini-games.</description>
 
     <dependencies>
+        <!-- Own dependencies -->
+        <dependency>
+            <groupId>ru.divinecraft</groupId>
+            <artifactId>zaraza-common-api</artifactId>
+        </dependency>
+
         <!-- Runtime -->
         <dependency>
             <groupId>com.destroystokyo.paper</groupId>
@@ -34,37 +43,11 @@
             <artifactId>ProtocolLib</artifactId>
         </dependency>
 
-        <!-- Libraries -->
-        <dependency>
-            <groupId>ru.progrm-jarvis</groupId>
-            <artifactId>java-commons</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>ru.progrm-jarvis</groupId>
-            <artifactId>reflector</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>ru.progrm-jarvis</groupId>
-            <artifactId>ultimate-messenger</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>ru.progrm-jarvis.minecraft</groupId>
-            <artifactId>packet-wrapper</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>ru.progrm-jarvis.minecraft</groupId>
-            <artifactId>minecraft-commons</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>ru.progrm-jarvis.minecraft</groupId>
-            <artifactId>fake-entity-lib</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.sentry</groupId>
-            <artifactId>sentry</artifactId>
-        </dependency>
-
         <!-- Code-generation -->
+        <dependency>
+            <groupId>org.immutables</groupId>
+            <artifactId>value</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -74,24 +57,6 @@
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-        </dependency>
-
-        <!-- Testing -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.vintage</groupId>
-            <artifactId>junit-vintage-engine</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
         </dependency>
     </dependencies>
 </project>
