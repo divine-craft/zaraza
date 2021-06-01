@@ -34,7 +34,8 @@ public class TextExtensions {
      * @param <T> type of the target
      * @return component created from the text model for the given target
      */
-    public <T> @NotNull Component toComponentOf(final @NotNull TextModel<T> textModel, final @NotNull T target) {
+    public <T> @NotNull Component toComponentOf(final @NotNull TextModel<? super T> textModel,
+                                                final @NotNull T target) {
         return GsonComponentSerializer.gson().deserialize(textModel.getText(target));
     }
 }
