@@ -39,7 +39,7 @@
         <version.zaraza>1.0.0-SNAPSHOT</version.zaraza>
         <zaraza.rootPackage>ru.divinecraft.zaraza</zaraza.rootPackage>
         <zaraza.libPackage>${zaraza.rootPackage}.lib</zaraza.libPackage>
-        <version.padla>1.0.0-SNAPSHOT</version.padla>
+        <version.padla>1.0.0-rc.3</version.padla>
         <version.minecraft-utils>1.0.0-SNAPSHOT</version.minecraft-utils>
         <version.junit>5.7.1</version.junit>
     </properties>
@@ -212,6 +212,7 @@
             </dependency>
 
             <!-- Libraries -->
+            <!-- General purpose -->
             <dependency>
                 <groupId>it.unimi.dsi</groupId>
                 <artifactId>fastutil</artifactId>
@@ -227,6 +228,23 @@
                 <artifactId>reflector</artifactId>
                 <version>${version.padla}</version>
             </dependency>
+            <!-- Data storage -->
+            <dependency>
+                <groupId>com.zaxxer</groupId>
+                <artifactId>HikariCP</artifactId>
+                <version>4.0.3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-core</artifactId>
+                <version>7.9.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq</artifactId>
+                <version>3.14.11</version>
+            </dependency>
+            <!-- Minecraft-specific -->
             <dependency>
                 <groupId>ru.progrm-jarvis</groupId>
                 <artifactId>ultimate-messenger</artifactId>
@@ -247,6 +265,7 @@
                 <artifactId>packet-wrapper</artifactId>
                 <version>1.16.4-SNAPSHOT</version>
             </dependency>
+            <!-- Misc -->
             <dependency>
                 <groupId>io.sentry</groupId>
                 <artifactId>sentry</artifactId>
