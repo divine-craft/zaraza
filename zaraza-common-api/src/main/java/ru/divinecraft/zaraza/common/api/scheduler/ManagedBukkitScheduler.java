@@ -17,10 +17,8 @@ package ru.divinecraft.zaraza.common.api.scheduler;
 import lombok.NonNull;
 import org.bukkit.scheduler.BukkitScheduler;
 import org.bukkit.scheduler.BukkitTask;
-import org.bukkit.scheduler.BukkitWorker;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.function.Consumer;
@@ -70,6 +68,7 @@ public interface ManagedBukkitScheduler {
      *
      * @param task task to be executed
      * @param delay delay in server ticks before executing the task
+     * @param period number of ticks to wait between runs
      * @return task ID or {@code -1} if scheduling failed
      *
      * @throws NullPointerException if {@code task} is {@code null}
