@@ -25,6 +25,11 @@
 
     <name>ZarazaGame</name>
     <description>DivineCraft's main API for creating mini-games.</description>
+    
+    <properties>
+        <!-- TODO delete once there are some classes -->
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+    </properties>
 
     <dependencies>
         <!-- Own dependencies -->
