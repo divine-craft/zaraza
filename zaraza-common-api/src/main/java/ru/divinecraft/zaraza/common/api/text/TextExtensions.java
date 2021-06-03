@@ -14,6 +14,7 @@
 
 package ru.divinecraft.zaraza.common.api.text;
 
+import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import lombok.experimental.UtilityClass;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
@@ -37,5 +38,31 @@ public class TextExtensions {
     public <T> @NotNull Component toComponentOf(final @NotNull TextModel<? super T> textModel,
                                                 final @NotNull T target) {
         return GsonComponentSerializer.gson().deserialize(textModel.getText(target));
+    }
+
+    /**
+     * Converts the specified text model to Protocol Lib API wrapped chat component.
+     *
+     * @param textModel text model whose text for the given target should be converted to a component
+     * @param target target for which to create a text
+     * @param <T> type of the target
+     * @return wrapped chat component created from the text model for the given target
+     */
+    public <T> @NotNull WrappedChatComponent toTextWrappedChatComponent(final @NotNull TextModel<? super T> textModel,
+                                                                        final @NotNull T target) {
+        return WrappedChatComponent.fromText(textModel.getText(target));
+    }
+
+    /**
+     * Converts the specified text model to Protocol Lib API wrapped chat component.
+     *
+     * @param textModel text model whose text for the given target should be converted to a component
+     * @param target target for which to create a text
+     * @param <T> type of the target
+     * @return wrapped chat component created from the text model for the given target
+     */
+    public <T> @NotNull WrappedChatComponent toJsonWrappedChatComponent(final @NotNull TextModel<? super T> textModel,
+                                                                        final @NotNull T target) {
+        return WrappedChatComponent.fromJson(textModel.getText(target));
     }
 }
