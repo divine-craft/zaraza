@@ -28,8 +28,6 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>11</java.version>
-        <maven.compiler.source>${java.version}</maven.compiler.source>
-        <maven.compiler.target>${java.version}</maven.compiler.target>
         <!-- GitHub -->
         <github.owner>divine-craft</github.owner>
         <github.repository>zaraza</github.repository>
@@ -42,7 +40,8 @@
         <version.padla>1.0.0-rc.4</version.padla>
         <version.minecraft-utils>1.0.0-SNAPSHOT</version.minecraft-utils>
         <version.jooq>3.15.1</version.jooq>
-        <version.junit>5.8.2</version.junit>
+        <version.r2dbc-migrate>1.7.0</version.r2dbc-migrate>
+        <version.junit>5.7.2</version.junit>
     </properties>
 
     <name>Zaraza</name>
@@ -121,6 +120,14 @@
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.1</version>
+                    <configuration>
+                        <release>${java.version}</release>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
                     <version>3.2.1</version>
                 </plugin>
@@ -175,6 +182,46 @@
                         </tags>
                     </configuration>
                 </plugin>
+                <!-- Database -->
+                <plugin>
+                    <groupId>org.jooq</groupId>
+                    <artifactId>jooq-codegen-maven</artifactId>
+                    <version>${version.jooq}</version>
+                    <executions>
+                        <execution>
+                            <id>jooq-codegen</id>
+                            <phase>generate-sources</phase>
+                            <goals>
+                                <goal>generate</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.jooq</groupId>
+                            <artifactId>jooq-meta-extensions</artifactId>
+                            <version>${version.jooq}</version>
+                        </dependency>
+                    </dependencies>
+                    <configuration>
+                        <generator>
+                            <database>
+                                <name>org.jooq.meta.extensions.ddl.DDLDatabase</name>
+                                <properties>
+                                    <property>
+                                        <key>scripts</key>
+                                        <value>src/main/resources/db/migration/V*__*.sql</value>
+                                    </property>
+                                    <property>
+                                        <key>sort</key>
+                                        <value>flyway</value>
+                                    </property>
+                                </properties>
+                            </database>
+                        </generator>
+                    </configuration>
+                </plugin>
+                <!-- Central deployment -->
                 <plugin>
                     <groupId>org.sonatype.plugins</groupId>
                     <artifactId>nexus-staging-maven-plugin</artifactId>
@@ -196,6 +243,16 @@
                 <groupId>ru.divinecraft</groupId>
                 <artifactId>zaraza-common-api</artifactId>
                 <version>${version.zaraza}</version>
+                <scope>provided</scope>
+            </dependency>
+
+            <!-- BOMs -->
+            <dependency>
+                <groupId>io.projectreactor</groupId>
+                <artifactId>reactor-bom</artifactId>
+                <version>2020.0.10</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
 
             <!-- Runtime -->
@@ -229,7 +286,24 @@
                 <artifactId>reflector</artifactId>
                 <version>${version.padla}</version>
             </dependency>
+            <dependency>
+                <groupId>ru.progrm-jarvis</groupId>
+                <artifactId>ultimate-messenger</artifactId>
+                <version>${version.padla}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.ben-manes.caffeine</groupId>
+                <artifactId>caffeine</artifactId>
+                <version>3.0.3</version>
+            </dependency>
             <!-- Data storage -->
+            <!-- Universal -->
+            <dependency>
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq</artifactId>
+                <version>${version.jooq}</version>
+            </dependency>
+            <!-- Synchronous -->
             <dependency>
                 <groupId>com.zaxxer</groupId>
                 <artifactId>HikariCP</artifactId>
@@ -241,16 +315,27 @@
                 <version>7.14.0</version>
             </dependency>
             <dependency>
-                <groupId>org.jooq</groupId>
-                <artifactId>jooq</artifactId>
-                <version>${version.jooq}</version>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>42.2.23</version>
+            </dependency>
+            <!-- Asynchronous -->
+            <dependency>
+                <groupId>name.nkonev.r2dbc-migrate</groupId>
+                <artifactId>r2dbc-migrate-core</artifactId>
+                <version>${version.r2dbc-migrate}</version>
+            </dependency>
+            <dependency>
+                <groupId>name.nkonev.r2dbc-migrate</groupId>
+                <artifactId>r2dbc-migrate-resource-reader-reflections</artifactId>
+                <version>${version.r2dbc-migrate}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>r2dbc-postgresql</artifactId>
+                <version>0.9.0.M2</version>
             </dependency>
             <!-- Minecraft-specific -->
-            <dependency>
-                <groupId>ru.progrm-jarvis</groupId>
-                <artifactId>ultimate-messenger</artifactId>
-                <version>${version.padla}</version>
-            </dependency>
             <dependency>
                 <groupId>ru.progrm-jarvis.minecraft</groupId>
                 <artifactId>minecraft-commons</artifactId>
@@ -266,7 +351,7 @@
                 <artifactId>packet-wrapper</artifactId>
                 <version>1.16.4-SNAPSHOT</version>
             </dependency>
-            <!-- Misc -->
+            <!-- Miscellaneous -->
             <dependency>
                 <groupId>io.sentry</groupId>
                 <artifactId>sentry</artifactId>
