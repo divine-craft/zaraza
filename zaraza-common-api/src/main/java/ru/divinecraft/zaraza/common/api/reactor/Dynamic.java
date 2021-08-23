@@ -81,7 +81,7 @@ public interface Dynamic<T> {
     @NotNull Flux<? extends T> asFlux();
 
     /**
-     * Creates a new dynamic value.
+     * Creates a new externally changed dynamic value.
      *
      * @param externalWriter function used to perform atomic compare-and-set of the value globally
      * @param publisher publisher emitting values on external value changes
@@ -97,13 +97,12 @@ public interface Dynamic<T> {
             + "_, null, _ -> fail;"
             + "_, _, null -> fail;"
             + "_, _, _ -> new;")
-    static <T> @NotNull Dynamic<T> create(
+    static <T> @NotNull Dynamic<T> createExternal(
             final @NonNull ReactiveCompareAndSetOperation<@NotNull ? super T> externalWriter,
             final @NonNull Publisher<? extends T> publisher,
             final @NonNull T initialValue
     ) {
         val sink = Sinks.many().replay().latestOrDefault(initialValue);
-        // TODO: handle emit errors
         Flux.from(publisher)
                 .subscribe(
                         value -> sink.emitNext(value, Sinks.EmitFailureHandler.FAIL_FAST),
@@ -111,18 +110,19 @@ public interface Dynamic<T> {
                         () -> sink.emitComplete(Sinks.EmitFailureHandler.FAIL_FAST)
                 );
 
-        return new ReactorDynamic<>(sink.asFlux(), externalWriter);
+        return new ExternalDynamic<>(sink.asFlux(), externalWriter);
     }
 
     /**
-     * {@link Dynamic} implementation which stores the {@link Flux} representation of {@link Sinks.Many}.
+     * {@link Dynamic} implementation which stores the {@link Flux} representation of {@link Sinks.Many}
+     * and relies on external changes.
      *
      * @param <T> type of dynamic value
      */
     //@formatter:off (don't merge last annotation and class declaration lines)
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-    final class ReactorDynamic<T> implements Dynamic<T> {
+    final class ExternalDynamic<T> implements Dynamic<T> {
         //@formatter:on
 
         /**

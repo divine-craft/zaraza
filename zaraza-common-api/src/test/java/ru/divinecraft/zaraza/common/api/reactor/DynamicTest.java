@@ -31,7 +31,7 @@ class DynamicTest {
         val sink = Sinks.many()
                 .unicast()
                 .<String>onBackpressureError();
-        val dynamic = Dynamic.create((oldValue, newValue) -> {
+        val dynamic = Dynamic.createExternal((oldValue, newValue) -> {
             sink.emitNext(newValue, Sinks.EmitFailureHandler.FAIL_FAST);
             return true;
         }, sink.asFlux(), "initial");
@@ -53,7 +53,7 @@ class DynamicTest {
         val sink = Sinks.many()
                 .unicast()
                 .<String>onBackpressureError();
-        val dynamic = Dynamic.create((oldValue, newValue) -> {
+        val dynamic = Dynamic.createExternal((oldValue, newValue) -> {
             // succeed CAS only after multiple attempts
             if (attemptsBeforeSuccess.decrementAndGet() == 0) {
                 sink.emitNext(newValue, Sinks.EmitFailureHandler.FAIL_FAST);
