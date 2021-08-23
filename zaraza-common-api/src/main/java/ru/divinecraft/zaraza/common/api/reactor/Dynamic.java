@@ -37,15 +37,15 @@ public interface Dynamic<T> {
     /**
      * Returns latest pushed element<br>
      * The invocation of {@code latest()} is equivalent to:
-     * <pre>asFlux().blockLast()</pre>
+     * <pre>asFlux().blockFirst()</pre>
      * <li>Note that returned value may NOT be ACTUAL value</li>
      *
-     * @return cached value or null if no elements was pushed and initial value not specified
+     * @return cached value
      */
     @Nullable T latest();
 
     /**
-     * Returns flux than cached last pushed element, so {@link Flux#blockLast()}
+     * Returns flux than cache last pushed element, so {@link Flux#blockFirst()}
      * returns latest element without any blocks
      *
      * @return Flux view of this dynamic
@@ -72,24 +72,24 @@ public interface Dynamic<T> {
      * @return new Dynamic
      */
     @Contract("_,_,_->new")
-    static <T> Dynamic<T> create(@NonNull CompareAndSetAction<T> writer, @NonNull Publisher<T> publisher, @Nullable T initialValue) {
-        Sinks.Many<T> sink = Sinks.many().replay().latestOrDefault(initialValue);//null allowed here, just missed annotation on source
-        Flux.from(publisher)
-                .doOnNext(sink::tryEmitNext)
-                .doOnComplete(sink::tryEmitComplete);
-        return new ReactorDynamic<>(sink, writer);
+    static <T> Dynamic<T> create(@NonNull CompareAndSetAction<T> writer, @NonNull Publisher<T> publisher, @NotNull T initialValue) {
+        Sinks.Many<T> sink = Sinks.many().replay().latestOrDefault(initialValue);
+        Flux.from(publisher).subscribe(sink::tryEmitNext, sink::tryEmitError, sink::tryEmitComplete);
+        return new ReactorDynamic<>(sink,
+                sink.asFlux(),//replay sink cache last value manually. BTW #asFlux() for ReplayingSink returns its Sink instance
+                writer);
     }
 
     @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
     @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
     final class ReactorDynamic<T> implements Dynamic<T> {
         Sinks.Many<T> sink;
-        Flux<T> asFlux = sink.asFlux();//replay sink cache last value manually. BTW #asFlux() for ReplayingSink returns its Sink instance
+        Flux<T> asFlux;
         CompareAndSetAction<T> writer;
 
         @Override
         public @Nullable T latest() {
-            return asFlux().blockLast();
+            return asFlux().blockFirst();
         }
 
         @Override
