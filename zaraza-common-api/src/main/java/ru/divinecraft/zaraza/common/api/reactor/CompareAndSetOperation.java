@@ -17,18 +17,19 @@ package ru.divinecraft.zaraza.common.api.reactor;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Represents atomic compare and set operation
+ * Atomic compare-and-set operation.
  *
- * @param <T> type of values
+ * @param <T> type of manipulated values
  */
 @FunctionalInterface
-public interface CompareAndSetAction<T> {
+public interface CompareAndSetOperation<T> {
+
     /**
-     * Executes CompareAndSet operation
+     * Performs compare-and-set operation
      *
-     * @param newValue value to set
-     * @param oldValue expected old value
-     * @return true if operation success, otherwise false
+     * @param oldValue the expected value
+     * @param newValue the new value
+     * @return {@code true} if the operation succeeds or {@code false} otherwise
      */
-    boolean compareAndSet(@NotNull T newValue, @NotNull T oldValue);
+    boolean compareAndSet(T oldValue, T newValue);
 }

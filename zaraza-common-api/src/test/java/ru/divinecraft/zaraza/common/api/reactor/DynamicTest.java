@@ -23,7 +23,7 @@ class DynamicTest {
 
     @Test
     void cashingInitialValueTest() {
-        Dynamic<String> dyn = Dynamic.create((n, i) -> true, Flux.empty(), "foo");
+        Dynamic<String> dyn = Dynamic.create((i, n) -> true, Flux.empty(), "foo");
         assertEquals(dyn.latest(), "foo");
         assertEquals(dyn.latest(), "foo");
         assertEquals(dyn.latest(), "foo");
@@ -31,7 +31,7 @@ class DynamicTest {
 
     @Test
     void cashingSomeReceivedValueTest() {
-        Dynamic<String> dyn = Dynamic.create((n, i) -> true, Flux.just("bar", "nobar", "hello"), "foo");
+        Dynamic<String> dyn = Dynamic.create((i, n) -> true, Flux.just("bar", "nobar", "hello"), "foo");
         assertEquals(dyn.latest(), "hello");
         assertEquals(dyn.latest(), "hello");
     }

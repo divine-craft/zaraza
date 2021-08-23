@@ -72,7 +72,7 @@ public interface Dynamic<T> {
      * @return new Dynamic
      */
     @Contract("_,_,_->new")
-    static <T> Dynamic<T> create(@NonNull CompareAndSetAction<T> writer, @NonNull Publisher<T> publisher, @NotNull T initialValue) {
+    static <T> Dynamic<T> create(@NonNull CompareAndSetOperation<T> writer, @NonNull Publisher<T> publisher, @NotNull T initialValue) {
         Sinks.Many<T> sink = Sinks.many().replay().latestOrDefault(initialValue);
         Flux.from(publisher).subscribe(sink::tryEmitNext, sink::tryEmitError, sink::tryEmitComplete);
         return new ReactorDynamic<>(sink,
@@ -85,7 +85,7 @@ public interface Dynamic<T> {
     final class ReactorDynamic<T> implements Dynamic<T> {
         Sinks.Many<T> sink;
         Flux<T> asFlux;
-        CompareAndSetAction<T> writer;
+        CompareAndSetOperation<T> writer;
 
         @Override
         public @Nullable T latest() {
@@ -102,7 +102,7 @@ public interface Dynamic<T> {
             Mono<Boolean> mono = Mono.fromCallable(() -> {
                 T old;
                 if ((old = latest()) == null) return false;
-                return writer.compareAndSet(value, old);
+                return writer.compareAndSet(old, value);
             });
             mono.subscribe();
             return mono;
