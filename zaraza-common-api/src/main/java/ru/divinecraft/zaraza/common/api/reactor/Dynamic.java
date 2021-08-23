@@ -97,9 +97,11 @@ public interface Dynamic<T> {
             + "_, null, _ -> fail;"
             + "_, _, null -> fail;"
             + "_, _, _ -> new;")
-    static <T> @NotNull Dynamic<T> create(final @NonNull CompareAndSetOperation<@NotNull ? super T> externalWriter,
-                                          final @NonNull Publisher<? extends T> publisher,
-                                          final @NonNull T initialValue) {
+    static <T> @NotNull Dynamic<T> create(
+            final @NonNull ReactiveCompareAndSetOperation<@NotNull ? super T> externalWriter,
+            final @NonNull Publisher<? extends T> publisher,
+            final @NonNull T initialValue
+    ) {
         val sink = Sinks.many().replay().latestOrDefault(initialValue);
         // TODO: handle emit errors
         Flux.from(publisher)
@@ -131,7 +133,7 @@ public interface Dynamic<T> {
         /**
          * Operation responsible for performing atomic compare-and-swap.
          */
-        @NotNull CompareAndSetOperation<@NotNull ? super T> externalWriter;
+        @NotNull ReactiveCompareAndSetOperation<@NotNull ? super T> externalWriter;
 
         @Override
         public @Nullable T snapshot() {
@@ -147,7 +149,7 @@ public interface Dynamic<T> {
         @Override
         public @NotNull Mono<Boolean> trySet(final @NotNull T newValue) {
             return asFlux.next()
-                    .map(current -> externalWriter.compareAndSet(current, newValue));
+                    .flatMap(current -> externalWriter.compareAndSet(current, newValue));
         }
 
         @Override
