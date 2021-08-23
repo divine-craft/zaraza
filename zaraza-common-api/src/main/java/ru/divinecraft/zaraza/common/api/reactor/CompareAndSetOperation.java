@@ -32,4 +32,14 @@ public interface CompareAndSetOperation<T> {
      * @return {@code true} if the operation succeeds or {@code false} otherwise
      */
     boolean compareAndSet(T oldValue, T newValue);
+
+    /**
+     * Creates a compare-ans-set operation which never succeeds.
+     *
+     * @param <T> type of manipulated values
+     * @return created impossible compare-and-set operation
+     */
+    static @NotNull <T> CompareAndSetOperation<T> impossible() {
+        return (oldValue, newValue) -> false;
+    }
 }
