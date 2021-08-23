@@ -173,10 +173,10 @@ public interface Dynamic<T> {
                     null, null, true, false
             );
 
-            public ShouldRetry(final @Nullable String message,
-                               final @Nullable Throwable cause,
-                               final boolean enableSuppression,
-                               final boolean writableStackTrace) {
+            private ShouldRetry(final @Nullable String message,
+                                final @Nullable Throwable cause,
+                                final boolean enableSuppression,
+                                final boolean writableStackTrace) {
                 super(message, cause, enableSuppression, writableStackTrace);
             }
         }
