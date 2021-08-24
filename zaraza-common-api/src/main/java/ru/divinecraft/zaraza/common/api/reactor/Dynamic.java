@@ -139,7 +139,8 @@ public interface Dynamic<T> {
         public @NotNull T snapshot() {
             // non-blocking: `asFlux` is *replaying* thus it always produces the value instantly
             val snapshot= asFlux.blockFirst();
-            assert  snapshot != null : "non-null snapshot should have been cached";
+            assert snapshot != null : "non-null snapshot should have been cached";
+
             return snapshot;
         }
 
