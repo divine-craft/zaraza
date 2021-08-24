@@ -17,6 +17,7 @@ package ru.divinecraft.zaraza.common.api.reactor;
 import lombok.val;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
+import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
 import reactor.test.StepVerifier;
 
@@ -27,13 +28,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class DynamicTest {
 
     @Test
-    void dynamic_create__multicasts() {
+    void dynamic_createExternal__multicasts() {
         val sink = Sinks.many()
                 .unicast()
                 .<String>onBackpressureError();
-        val dynamic = Dynamic.create((oldValue, newValue) -> {
+        val dynamic = Dynamic.createExternal((oldValue, newValue) -> {
             sink.emitNext(newValue, Sinks.EmitFailureHandler.FAIL_FAST);
-            return true;
+            return Mono.just(true);
         }, sink.asFlux(), "initial");
 
         assertDynamicReplays(dynamic, "initial", 1, 3, 54, 4, 64, 3, 2);
@@ -47,21 +48,21 @@ class DynamicTest {
     }
 
     @Test
-    void dynamic_create__update() {
+    void dynamic_createExternal__update() {
         val attemptsBeforeSuccess = new AtomicInteger(77);
 
         val sink = Sinks.many()
                 .unicast()
                 .<String>onBackpressureError();
-        val dynamic = Dynamic.create((oldValue, newValue) -> {
+        val dynamic = Dynamic.createExternal((oldValue, newValue) -> {
             // succeed CAS only after multiple attempts
             if (attemptsBeforeSuccess.decrementAndGet() == 0) {
                 sink.emitNext(newValue, Sinks.EmitFailureHandler.FAIL_FAST);
 
-                return true;
+                return Mono.just(true);
             }
 
-            return false;
+            return Mono.just(false);
         }, sink.asFlux(), "foo");
 
         assertDynamicReplays(dynamic, "foo", 121, 21, 486, 4, 525, 653, 364, 4);

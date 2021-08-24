@@ -20,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
  * Atomic compare-and-set operation.
  *
  * @param <T> type of manipulated values
+ * @see ReactiveCompareAndSetOperation reactive equivalent
  */
 @FunctionalInterface
 public interface CompareAndSetOperation<T> {
