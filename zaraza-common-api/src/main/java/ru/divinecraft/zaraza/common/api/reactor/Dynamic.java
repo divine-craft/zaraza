@@ -48,7 +48,7 @@ public interface Dynamic<T> {
      * @apiNote the returned value is the latest observed snapshot and may be globally "old",
      * as there may be a foreground process eventually leading to the value being changed
      */
-    @Nullable T snapshot();
+    @NotNull T snapshot();
 
     /**
      * <p>Asynchronously attempts to set this value to the new state.</p>
@@ -136,9 +136,11 @@ public interface Dynamic<T> {
         @NotNull ReactiveCompareAndSetOperation<@NotNull ? super T> externalWriter;
 
         @Override
-        public @Nullable T snapshot() {
+        public @NotNull T snapshot() {
             // non-blocking: `asFlux` is *replaying* thus it always produces the value instantly
-            return asFlux.blockFirst();
+            val snapshot= asFlux.blockFirst();
+            assert  snapshot != null : "non-null snapshot should have been cached";
+            return snapshot;
         }
 
         @Override
