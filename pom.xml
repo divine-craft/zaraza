@@ -37,11 +37,9 @@
         <version.zaraza>1.0.0-SNAPSHOT</version.zaraza>
         <zaraza.rootPackage>ru.divinecraft.zaraza</zaraza.rootPackage>
         <zaraza.libPackage>${zaraza.rootPackage}.lib</zaraza.libPackage>
-        <version.padla>1.0.0-rc.6</version.padla>
         <version.minecraft-utils>1.0.0-SNAPSHOT</version.minecraft-utils>
         <version.jooq>3.15.2</version.jooq>
         <version.r2dbc-migrate>1.7.0</version.r2dbc-migrate>
-        <version.junit>5.7.2</version.junit>
     </properties>
 
     <name>Zaraza</name>
@@ -248,9 +246,23 @@
 
             <!-- BOMs -->
             <dependency>
+                <groupId>ru.progrm-jarvis</groupId>
+                <artifactId>padla-bom</artifactId>
+                <version>1.0.0-rc.6</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
                 <groupId>io.projectreactor</groupId>
                 <artifactId>reactor-bom</artifactId>
                 <version>2020.0.10</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>5.8.0-RC1</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -275,21 +287,6 @@
                 <groupId>it.unimi.dsi</groupId>
                 <artifactId>fastutil</artifactId>
                 <version>8.5.2</version>
-            </dependency>
-            <dependency>
-                <groupId>ru.progrm-jarvis</groupId>
-                <artifactId>java-commons</artifactId>
-                <version>${version.padla}</version>
-            </dependency>
-            <dependency>
-                <groupId>ru.progrm-jarvis</groupId>
-                <artifactId>reflector</artifactId>
-                <version>${version.padla}</version>
-            </dependency>
-            <dependency>
-                <groupId>ru.progrm-jarvis</groupId>
-                <artifactId>ultimate-messenger</artifactId>
-                <version>${version.padla}</version>
             </dependency>
             <dependency>
                 <groupId>com.github.ben-manes.caffeine</groupId>
@@ -384,25 +381,6 @@
             </dependency>
 
             <!-- Testing -->
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter-api</artifactId>
-                <version>${version.junit}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter-params</artifactId>
-                <version>${version.junit}</version>
-                <scope>test</scope>
-            </dependency>
-            <!-- This one is required to run correctly as some dependencies bring legacy Junit with them -->
-            <dependency>
-                <groupId>org.junit.vintage</groupId>
-                <artifactId>junit-vintage-engine</artifactId>
-                <version>${version.junit}</version>
-                <scope>test</scope>
-            </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
