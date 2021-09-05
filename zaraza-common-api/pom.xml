@@ -80,16 +80,16 @@
         </dependency>
         <!-- Asynchronous -->
         <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>r2dbc-postgresql</artifactId>
+        </dependency>
+        <dependency>
             <groupId>name.nkonev.r2dbc-migrate</groupId>
             <artifactId>r2dbc-migrate-core</artifactId>
         </dependency>
         <dependency>
             <groupId>name.nkonev.r2dbc-migrate</groupId>
             <artifactId>r2dbc-migrate-resource-reader-reflections</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>r2dbc-postgresql</artifactId>
         </dependency>
         <!-- Message queuing -->
         <dependency>
