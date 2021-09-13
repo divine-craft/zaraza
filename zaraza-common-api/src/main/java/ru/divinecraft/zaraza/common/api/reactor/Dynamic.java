@@ -27,6 +27,8 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.publisher.Sinks;
+import reactor.util.retry.Retry;
+import ru.progrm_jarvis.javacommons.annotation.Any;
 
 import java.util.function.UnaryOperator;
 
@@ -139,7 +141,7 @@ public interface Dynamic<T> {
         public @NotNull T snapshot() {
             // non-blocking: `asFlux` is *replaying* thus it always produces the value instantly
             val snapshot = asFlux.blockFirst();
-            assert snapshot != null : "non-null snapshot should have been cached";
+            assert snapshot != null : "Non-null snapshot should have been cached";
 
             return snapshot;
         }
@@ -160,8 +162,8 @@ public interface Dynamic<T> {
             return Mono.defer(() -> asFlux.next().flatMap(oldValue -> {
                 final T newValue;
                 return trySet(newValue = updater.apply(oldValue))
-                        .flatMap(successful -> successful ? Mono.just(newValue) : Mono.error(ShouldRetry.INSTANCE));
-            })).retry();
+                        .flatMap(successful -> successful ? Mono.just(newValue) : ShouldRetry.trigger());
+            })).retryWhen(ShouldRetry.ONLY);
         }
 
         /**
@@ -176,11 +178,29 @@ public interface Dynamic<T> {
                     null, null, true, false
             );
 
+            /**
+             * Retry "spec" which allows retries only if they are caused by {@link #INSTANCE}.
+             */
+            private static final @NotNull Retry ONLY = Retry
+                    .indefinitely()
+                    .filter(error -> error == INSTANCE);
+
             private ShouldRetry(final @Nullable String message,
                                 final @Nullable Throwable cause,
                                 final boolean enableSuppression,
                                 final boolean writableStackTrace) {
                 super(message, cause, enableSuppression, writableStackTrace);
+            }
+
+            /**
+             * Creates an instantly errored mono with {@link #INSTANCE} as its error
+             * thus allowing retry via {@link #ONLY}.
+             *
+             * @param <T> type of the resulting mono
+             * @return errored mono allowing retry via {@link #ONLY}
+             */
+            private static <@Any T> @NotNull Mono<T> trigger() {
+                return Mono.error(INSTANCE);
             }
         }
     }
