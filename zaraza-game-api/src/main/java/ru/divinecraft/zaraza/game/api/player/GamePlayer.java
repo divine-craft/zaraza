@@ -27,5 +27,5 @@ public interface GamePlayer {
      *
      * @return Bukkit player representation of this player
      */
-    @NotNull Player asPlayer();
+    @NotNull Player asBukkitPlayer();
 }
