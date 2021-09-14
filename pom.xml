@@ -244,6 +244,12 @@
                 <version>${version.zaraza}</version>
                 <scope>provided</scope>
             </dependency>
+            <dependency>
+                <groupId>ru.divinecraft</groupId>
+                <artifactId>zaraza-game-api</artifactId>
+                <version>${version.zaraza}</version>
+                <scope>provided</scope>
+            </dependency>
 
             <!-- BOMs -->
             <dependency>
