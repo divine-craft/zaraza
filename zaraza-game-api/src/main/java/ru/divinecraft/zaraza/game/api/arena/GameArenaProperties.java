@@ -15,16 +15,12 @@
 package ru.divinecraft.zaraza.game.api.arena;
 
 import net.kyori.adventure.text.Component;
-import org.immutables.gson.Gson;
-import org.immutables.value.Value;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * Constant properties of a game arena.
  */
-@Value.Immutable
-@Gson.TypeAdapters
 public interface GameArenaProperties {
 
     /**

@@ -18,15 +18,18 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 import ru.divinecraft.zaraza.game.api.player.GamePlayer;
 import ru.progrm_jarvis.javacommons.object.Result;
+
+import java.util.Set;
 
 /**
  * Individual game arena.
  *
- * @param <P> type of players playing on this arena
+ * @param <TPlayer> type of players playing on this arena
  */
-public interface GameArena<P extends GamePlayer> {
+public interface GameArena<TProperties extends GameArenaProperties, TPlayer extends GamePlayer> {
 
     // Properties
 
@@ -36,7 +39,7 @@ public interface GameArena<P extends GamePlayer> {
      * @return properties of this arena
      */
     @Contract(pure = true)
-    @NotNull GameArenaProperties properties();
+    @NotNull TProperties properties();
 
     // Player management
 
@@ -47,33 +50,40 @@ public interface GameArena<P extends GamePlayer> {
      * @return a successful result of a newly created game player corresponding to the provided player
      * if the join succeeds or an error result otherwise
      */
-    @NotNull Result<@NotNull P, @NotNull ArenaJoinError> join(@NotNull Player player);
+    @NotNull Result<@NotNull TPlayer, @NotNull ArenaJoinError> join(@NotNull Player player);
 
     /**
      * An error which may occur on {@link #join(Player)}.
      */
     enum ArenaJoinError {
         /**
-         * The player is already playing on this arena.
+         * The arena is loading.
          */
-        ALREADY_PLAYING,
+        ARENA_LOADING,
+
         /**
          * The arena has reached its player limit.
          */
         OUT_OF_SLOTS,
+
+        /**
+         * The game is already running and does not support in-game joins.
+         */
+        GAME_RUNNING,
+
         /**
          * Arena-specific error.
          */
-        OTHER,
+        OTHER
     }
 
     /**
-     * Gets the {@link P game player} representation of the provided player for this arena.
+     * Gets the {@link TPlayer game player} representation of the provided player for this arena.
      *
      * @param player player for whom game player representation should be retrieved
      * @return game player corresponding to the player if he is playing this arena or {@code null} otherwise
      */
-    @Nullable P getPlayer(@NotNull Player player);
+    @Nullable TPlayer getPlayer(@NotNull Player player);
 
     /**
      * Attempts to leave the player from this arena.
@@ -82,4 +92,18 @@ public interface GameArena<P extends GamePlayer> {
      * @return {@code true} if the leave succeeds (i.e. the player leaves the arena) and {@code false} otherwise
      */
     boolean leave(@NotNull Player player);
+
+    /**
+     * Gets the number of currently playing players.
+     *
+     * @return number of currently playing players
+     */
+    int getPlayerCount();
+
+    /**
+     * Gets the number of currently playing players.
+     *
+     * @return number of currently playing players
+     */
+    @NotNull @Unmodifiable Set<? extends TPlayer> getPlayers();
 }
