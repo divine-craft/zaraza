@@ -268,6 +268,13 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
+                <groupId>io.sentry</groupId>
+                <artifactId>sentry-bom</artifactId>
+                <version>5.2.0</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.junit</groupId>
                 <artifactId>junit-bom</artifactId>
                 <version>5.8.1</version>
@@ -350,12 +357,6 @@
                 <groupId>ru.progrm-jarvis.minecraft</groupId>
                 <artifactId>packet-wrapper</artifactId>
                 <version>1.16.4-SNAPSHOT</version>
-            </dependency>
-            <!-- Miscellaneous -->
-            <dependency>
-                <groupId>io.sentry</groupId>
-                <artifactId>sentry</artifactId>
-                <version>5.2.0</version>
             </dependency>
 
             <!-- Code-generation -->
