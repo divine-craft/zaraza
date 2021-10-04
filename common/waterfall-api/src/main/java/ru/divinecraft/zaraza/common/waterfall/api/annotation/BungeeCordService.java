@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
 // non-inherited and default retention is correct
 @Documented
 @Target(ElementType.TYPE)
-public @interface BungeecordService {
+public @interface BungeeCordService {
 
     /**
      * Gets the dependency names which is required for the annotated service to be available.
