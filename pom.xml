@@ -12,8 +12,9 @@
   ~ limitations under the License.
   -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ru.divinecraft</groupId>
@@ -21,8 +22,9 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
-        <module>zaraza-common-api</module>
-        <module>zaraza-game-api</module>
+        <module>common</module>
+        <module>game</module>
+        <module>bom</module>
     </modules>
 
     <properties>
@@ -238,9 +240,41 @@
     <dependencyManagement>
         <dependencies>
             <!-- Own modules -->
+            <!-- Common -->
             <dependency>
                 <groupId>ru.divinecraft</groupId>
                 <artifactId>zaraza-common-api</artifactId>
+                <version>${version.zaraza}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>ru.divinecraft</groupId>
+                <artifactId>zaraza-common-paper-api</artifactId>
+                <version>${version.zaraza}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>ru.divinecraft</groupId>
+                <artifactId>zaraza-common-waterfall-api</artifactId>
+                <version>${version.zaraza}</version>
+                <scope>provided</scope>
+            </dependency>
+            <!-- Game -->
+            <dependency>
+                <groupId>ru.divinecraft</groupId>
+                <artifactId>zaraza-game-api</artifactId>
+                <version>${version.zaraza}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>ru.divinecraft</groupId>
+                <artifactId>zaraza-game-paper-api</artifactId>
+                <version>${version.zaraza}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>ru.divinecraft</groupId>
+                <artifactId>zaraza-game-waterfall-api</artifactId>
                 <version>${version.zaraza}</version>
                 <scope>provided</scope>
             </dependency>
@@ -293,6 +327,12 @@
                 <groupId>com.comphenix.protocol</groupId>
                 <artifactId>ProtocolLib</artifactId>
                 <version>4.7.0</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.github.waterfallmc</groupId>
+                <artifactId>waterfall-api</artifactId>
+                <version>1.17-R0.1-SNAPSHOT</version>
                 <scope>provided</scope>
             </dependency>
 
