@@ -35,10 +35,12 @@
         <github.repository>zaraza</github.repository>
         <github.coordinate>${github.owner}/${github.repository}</github.coordinate>
         <github.url>https://github.com/${github.coordinate}</github.url>
-        <!-- Dependency versions -->
+        <!-- Reflective definitions -->
+        <!-- Note: version variable is mostly for use by implementations -->
         <version.zaraza>1.0.0-SNAPSHOT</version.zaraza>
         <zaraza.rootPackage>ru.divinecraft.zaraza</zaraza.rootPackage>
         <zaraza.libPackage>${zaraza.rootPackage}.lib</zaraza.libPackage>
+        <!-- Dependency versions -->
         <version.minecraft-utils>1.0.0-SNAPSHOT</version.minecraft-utils>
         <version.jooq>3.15.3</version.jooq>
         <version.r2dbc-migrate>1.7.0</version.r2dbc-migrate>
@@ -245,38 +247,32 @@
                 <groupId>ru.divinecraft</groupId>
                 <artifactId>zaraza-common-api</artifactId>
                 <version>${version.zaraza}</version>
-                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>ru.divinecraft</groupId>
                 <artifactId>zaraza-common-paper-api</artifactId>
                 <version>${version.zaraza}</version>
-                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>ru.divinecraft</groupId>
                 <artifactId>zaraza-common-waterfall-api</artifactId>
                 <version>${version.zaraza}</version>
-                <scope>provided</scope>
             </dependency>
             <!-- Game -->
             <dependency>
                 <groupId>ru.divinecraft</groupId>
                 <artifactId>zaraza-game-api</artifactId>
                 <version>${version.zaraza}</version>
-                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>ru.divinecraft</groupId>
                 <artifactId>zaraza-game-paper-api</artifactId>
                 <version>${version.zaraza}</version>
-                <scope>provided</scope>
             </dependency>
             <dependency>
                 <groupId>ru.divinecraft</groupId>
                 <artifactId>zaraza-game-waterfall-api</artifactId>
                 <version>${version.zaraza}</version>
-                <scope>provided</scope>
             </dependency>
 
             <!-- BOMs -->
