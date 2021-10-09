@@ -27,6 +27,8 @@ import java.io.IOException;
 
 /**
  * Utility for manipulating <b>BungeeCord</b> Plugin Messaging API.
+ *
+ * @deprecated this API is to be replaced with a more useful channel-object one
  */
 @UtilityClass
 @Deprecated(forRemoval = true) // should be replaced with `BungeecordClient` API
