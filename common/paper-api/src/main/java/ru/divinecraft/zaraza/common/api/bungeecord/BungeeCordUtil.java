@@ -16,14 +16,18 @@ package ru.divinecraft.zaraza.common.api.bungeecord;
 
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.java.PluginClassLoader;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Legacy alias of {@link  ru.divinecraft.zaraza.common.paper.api.bungeecord.BungeeCordUtil}.
  *
  * @deprecated this class is in the invalid package and thus will get removed once all our callers migrated
  */
+@Slf4j
 @UtilityClass
 @Deprecated(forRemoval = true)
 public class BungeeCordUtil {
@@ -36,6 +40,8 @@ public class BungeeCordUtil {
      * @apiNote this is requires before using other <b>BungeeCord</b> Plugin Messaging methods
      */
     public void enableBungeeCordMessaging(final @NonNull Plugin plugin) {
+        reportLegacyCaller(StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).getCallerClass());
+
         ru.divinecraft.zaraza.common.paper.api.bungeecord.BungeeCordUtil.enableBungeeCordMessaging(plugin);
     }
 
@@ -59,5 +65,15 @@ public class BungeeCordUtil {
                              final @NonNull Player player,
                              final @NonNull String targetServerName) {
         ru.divinecraft.zaraza.common.paper.api.bungeecord.BungeeCordUtil.sendToServer(plugin, player, targetServerName);
+    }
+
+    private static void reportLegacyCaller(final @NotNull Class<?> legacyCaller) {
+        final ClassLoader classLoader;
+        log.warn("{} is using legacy `BungeeCordUtil` "
+                        + "and should migrate to `ru.divinecraft.zaraza.common.paper.api.bungeecord.BungeeCordUtil`",
+                (classLoader = legacyCaller.getClassLoader()) instanceof PluginClassLoader
+                        ? "Plugin " + ((PluginClassLoader) classLoader).getPlugin().getName()
+                        : "Unknown plugin"
+        );
     }
 }
