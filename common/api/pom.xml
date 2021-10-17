@@ -61,12 +61,10 @@
         <dependency>
             <groupId>com.zaxxer</groupId>
             <artifactId>HikariCP</artifactId>
-            <version>5.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>7.15.0</version>
         </dependency>
         <dependency>
             <groupId>org.postgresql</groupId>
@@ -84,6 +82,11 @@
         <dependency>
             <groupId>name.nkonev.r2dbc-migrate</groupId>
             <artifactId>r2dbc-migrate-resource-reader-reflections</artifactId>
+        </dependency>
+        <!-- Redis -->
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
         </dependency>
         <!-- Message queuing -->
         <dependency>
