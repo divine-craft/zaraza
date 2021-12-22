@@ -249,7 +249,7 @@
             <dependency>
                 <groupId>ru.progrm-jarvis</groupId>
                 <artifactId>padla-bom</artifactId>
-                <version>1.0.0-rc.6</version>
+                <version>1.0.0-rc.8</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
